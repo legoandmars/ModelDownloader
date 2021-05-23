@@ -1,0 +1,14 @@
+﻿<div horizontal-fit="PreferredSize" vertical-fit="PreferredSize" anchor-pos-y="6">
+  <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
+    <img preserve-aspect="true" id="thumbnail" pref-width="50" pref-height="50"></img>
+    <horizontal>
+      <text id="name" text='Model' align='Left' font-size='6' pref-height="6"/>
+      <clickable-text id="author-name" text='Author' align='Right' font-size='4' pref-height="2" on-click='author-name-click'/>
+    </horizontal>
+    
+    <horizontal pref-width="50" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="2">
+      <button id="downloadButton" interactable="~downloadInteractable"  on-click="downloadPressed" text="Download" pad="0" pref-height="8" pref-width="25" anchor-pos-y="25"></button>
+      <button id="previewButton" interactable="~previewInteractable" on-click="previewPressed" text="Preview" pad="0" pref-height="8" pref-width="25" anchor-pos-y="25"></button>
+    </horizontal>
+  </vertical>
+</div>

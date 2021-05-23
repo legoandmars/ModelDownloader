@@ -1,0 +1,40 @@
+﻿<bg child-control-height='false' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+  <modal-keyboard id="searchKeyboard" move-to-center="true" value="searchValue" show-event="open-searchKeyboard" hide-event="close-searchKeyboard,closeAllModals" clear-on-open="false" on-enter="searchPressed" clickerino-offerino-closerino="false"></modal-keyboard>
+  <modal id="sourceModal" show-event="open-sourceModal" hide-event="close-sourceModal,closeAllModals" move-to-center="true" size-delta-y="36" size-delta-x="50" clickerino-offerino-closerino="true">
+    <vertical anchor-pos-y="-2">
+      <!--  <page-button event-click="sourceList#PageUp" pref-width="14" direction="Up"></page-button> -->
+      <list id="sourceList" expand-cell="false" anchor-pos-x="-10" list-width="50" select-cell="sourceSelect"></list>
+      <!--   <page-button event-click="sourceList#PageDown" pref-width="14" direction="Down"></page-button> -->
+    </vertical>
+  </modal>
+  <vertical id="interactableGroup">
+    <horizontal horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="2" anchor-min-x="0" anchor-max-x="0.5">
+      <dropdown-list-setting text='' font-size='0' pref-width='20' size-delta-x='25' value='model-type-choice' choices='model-type-options' apply-on-change='true' on-change='#model-type-changed'/>
+      <button id="searchButton" pad="0" pref-height="8" pref-width="20" text="Search" on-click="searchOpened" click-event="open-searchKeyboard" ></button>
+      <button id="sortButton" pad="0" pref-height="8" pref-width="20" click-event="open-sourceModal" on-click="sortPressed" text="Sort"></button>
+    </horizontal>
+    <modal id="loadingModal" show-event="open-loadingModal" hide-event="close-loadingModal,closeAllModals" move-to-center="true" size-delta-y="35" size-delta-x="48">
+      <button id="abortButton" on-click="abortClicked" text="Abort" ignore-layout="true" anchor-min-x="0.5" anchor-max-x="0.5" anchor-pos-y="-30" anchor-pos-x="0" pref-height="8" pref-width="35" pad="0" ></button>
+    </modal>
+    <modal id="warningModal" show-event="open-warningModal" hide-event="close-warningModal,closeAllModals" move-to-center="true" size-delta-y="45" size-delta-x="60">
+      <vertical>
+        <horizontal bg='panel-top' pad-left='10' pad-right='10' horizontal-fit='PreferredSize'>
+          <text text='Warning' align='Center' font-size='7' />
+        </horizontal>
+        <vertical horizontal-fit="PreferredSize" vertical-fit="Unconstrained">
+          <vertical pref-width="53" horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
+            <text id="warning-text" text="This model requires the Custom Notes mod. Please install this mod from Mod Assistant or #pc-mods in BSMG to properly use this model." align="Center" word-wrapping="true" />
+          </vertical>
+        </vertical>
+        <horizontal pref-width="50" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="2" anchor-pos-y="50" >
+          <button id="dontShowButton" on-click="warningDontShowPressed" text="Don't show again" pad="0" pref-height="8" pref-width="30" anchor-pos-y="25"></button>
+          <button id="okButton" on-click="warningOKPressed" text="OK" pad="0" pref-height="8" pref-width="20" anchor-pos-y="25"></button>
+        </horizontal>
+      </vertical>
+    </modal>
+    <page-button event-click="list#PageUp" on-click="pageUpPressed" direction="Up"></page-button>
+    <list id="list" expand-cell="true" select-cell="listSelect">
+    </list>
+    <page-button id="songsPageDown" event-click="list#PageDown" on-click="pageDownPressed" direction="Down"></page-button>
+  </vertical>
+</bg>
