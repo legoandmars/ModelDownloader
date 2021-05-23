@@ -15,4 +15,6 @@ A PC Beat Saber mod that allows you to download Sabers, Notes, Platforms, and Av
 ## Installation and usage
 This mod requires SiraUtil and BSML, both of which can be installed easily with [Mod Assistant](https://github.com/Assistant/ModAssistant).
 
-You can install this mod by extracting the ZIP directly into your Beat Saber folder. If you're not sure where your Beat Saber folder is, it's explained on the [BSMG wiki here](https://bsmg.wiki/pc-modding.html#default-location).
+You can install this mod by extracting the ZIP found in the [latest release](https://github.com/legoandmars/ModelDownloader/releases/latest) directly into your Beat Saber folder. If you're not sure where your Beat Saber folder is, it's explained on the [BSMG wiki here](https://bsmg.wiki/pc-modding.html#default-location).
+
+To download models, click the "More Models" button found in your Mods tab to the left. After downloading new models, you may need to click the refresh button in the accompanying model mod to make it show up.
