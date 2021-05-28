@@ -5,5 +5,6 @@
         public virtual bool BlurNSFWImages { get; set; } = true;
         public virtual bool DisableWarnings { get; set; } = false;
         public virtual bool AutomaticallyGeneratePreviews { get; set; } = false;
+        public virtual string ShowPopup { get; set; } = "NextStartup";
     }
 }

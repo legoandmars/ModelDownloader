@@ -40,8 +40,18 @@
     <DisableZipRelease>True</DisableZipRelease>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="BSML">
       <HintPath>$(BeatSaberDir)\Plugins\BSML.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Colors">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Colors.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -138,6 +148,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\PluginConfig.cs" />
+    <Compile Include="HarmonyPatches\ModelDownloaderPatches.cs" />
+    <Compile Include="HarmonyPatches\Patches\AnimatorControllerPatch.cs" />
     <Compile Include="Installers\ModelDownloaderCoreInstaller.cs" />
     <Compile Include="Installers\ModelDownloaderMenuInstaller.cs" />
     <Compile Include="Managers\MenuButtonManager.cs" />
@@ -176,5 +188,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Settings\UI\Views\modelList.bsml" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Settings\UI\Resources\patreon.png" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

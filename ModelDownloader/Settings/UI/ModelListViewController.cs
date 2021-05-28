@@ -1,4 +1,6 @@
-﻿using BeatSaberMarkupLanguage.Attributes;
+﻿using BeatSaberMarkupLanguage;
+using BeatSaberMarkupLanguage.Animations;
+using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
@@ -25,6 +27,7 @@ namespace ModelDownloader.Settings.UI
         public ModelsaberSearchSort currentSort = 0;
         public string currentSearch = "";
         public bool searchingForPage = false;
+        public bool firstSearch = true;
 
         private List<ModelsaberEntry> _models = new List<ModelsaberEntry>();
 
@@ -33,7 +36,7 @@ namespace ModelDownloader.Settings.UI
         private static PluginConfig _pluginConfig;
 
         [UIParams]
-        internal BeatSaberMarkupLanguage.Parser.BSMLParserParams parserParams;
+        internal BeatSaberMarkupLanguage.Parser.BSMLParserParams parserParams = null;
 
         [UIValue("model-type-options")]
         private List<object> modelTypeOptions = new object[] { "All Models", "Sabers", "Bloqs", "Platforms", "Avatars" }.ToList();
@@ -42,10 +45,10 @@ namespace ModelDownloader.Settings.UI
         private string modelTypeChoice = "All Models";
 
         [UIComponent("list")]
-        public CustomListTableData customListTableData;
+        public CustomListTableData customListTableData = null;
 
         [UIComponent("loadingModal")]
-        public ModalView loadingModal;
+        public ModalView loadingModal = null;
 
         public Action<ModelsaberEntry, Sprite> didSelectModel;
 
@@ -80,6 +83,27 @@ namespace ModelDownloader.Settings.UI
             tagKey.keyaction += TagKeyPressed;
 
             GetModelPages(0);
+        }
+
+        [UIAction("donateClicked")]
+        public void DonateClicked()
+        {
+            //button.interactable = false;
+            //linkOpened.gameObject.SetActive(true);
+            //StartCoroutine(SecondRemove(button));
+            parserParams.EmitEvent("close-patreonModal");
+            Application.OpenURL("https://www.patreon.com/bobbievr");
+        }
+
+        [UIAction("closePressed")]
+        public void ClosePressed()
+        {
+            parserParams.EmitEvent("close-patreonModal");
+        }
+
+        public void OpenDonateModal()
+        {
+            parserParams.EmitEvent("open-patreonModal");
         }
 
         [UIAction("#model-type-changed")]
@@ -151,31 +175,54 @@ namespace ModelDownloader.Settings.UI
             int pageScrollAmount = (page * searchOptions.PageLength) - 1;
             if (pageScrollAmount > customListTableData.data.Count) pageScrollAmount = customListTableData.data.Count;
             if (pageScrollAmount < 0) pageScrollAmount = 0;
-
             customListTableData.tableView.ScrollToCellWithIdx(pageScrollAmount, TableView.ScrollPositionType.Beginning, false);
             searchingForPage = false;
+            /*
+             * Popup disabled temporarily due to potentially being controversial
+            if (firstSearch)
+            {
+                firstSearch = false;
+                if (_pluginConfig.ShowPopup == "NextStartup") _pluginConfig.ShowPopup = "True";
+                else if (_pluginConfig.ShowPopup == "True")
+                {
+                    // social experiment
+                    parserParams.EmitEvent("open-patreonModal");
+                    _pluginConfig.ShowPopup = "False";
+                }
+            }
+            */
         }
 
         public class ModelCellInfo : CustomListTableData.CustomCellInfo
         {
-            protected ModelsaberEntry _model;
+            public ModelsaberEntry Model;
             protected Action<CustomListTableData.CustomCellInfo> _callback;
             public ModelCellInfo(ModelsaberEntry model, Action<CustomListTableData.CustomCellInfo> callback, string text, string subtext = null) : base(text, subtext, null)
             {
-                _model = model;
+                Model = model;
                 _callback = callback;
                 LoadImage();
             }
             protected async void LoadImage()
             {
-                byte[] image = await _model.GetCoverImageBytes();
+                byte[] image = await Model.GetCoverImageBytes();
                 Sprite icon = null;
-                if(_model.Tags.Where(x => x.ToLower() == "nsfw").Count() > 0 && _pluginConfig.BlurNSFWImages)
+
+                if (Model.Thumbnail.EndsWith(".gif"))
                 {
-                    // nsfw image, blur it.
-                    icon = SpriteUtils.LoadSpriteFromTexture(_kawaseBlurRenderer.Blur(SpriteUtils.LoadTextureRaw(image), KawaseBlurRendererSO.KernelSize.Kernel35, 2));
+                    var animationData = await SpriteUtils.LoadSpriteRawAnimated(image, Model.Id.ToString() + ".gif");
+                    icon = animationData.sprites[0];
+                    icon.name = Model.Id.ToString() + ".gif";
                 }
-                else icon = SpriteUtils.LoadSpriteRaw(image);
+                else
+                {
+                    if(Model.Tags.Where(x => x.ToLower() == "nsfw").Count() > 0 && _pluginConfig.BlurNSFWImages)
+                    {
+                        // nsfw image, blur it.
+                        icon = SpriteUtils.LoadSpriteFromTexture(_kawaseBlurRenderer.Blur(SpriteUtils.LoadTextureRaw(image), KawaseBlurRendererSO.KernelSize.Kernel35, 2));
+                    }
+                    else icon = SpriteUtils.LoadSpriteRaw(image);
+                }
 
                 base.icon = icon;
                 _callback(this);
@@ -202,7 +249,45 @@ namespace ModelDownloader.Settings.UI
                 if (ReflectionUtil.GetField<TextMeshProUGUI, LevelListTableCell>(levelCell, "_songNameText")?.text == cell.text)
                 {
                     customListTableData.tableView.RefreshCellsContent();
-                    return;
+                    break;
+                }
+            }
+            FixAnimatedIcons(); 
+            //customListTableData.tableView.RefreshCellsContent();
+        }
+
+        internal void FixAnimatedIcons()
+        {
+            //overcomplicated way of doing this but god damn
+            foreach (var visibleCell in customListTableData.tableView.visibleCells)
+            {
+                LevelListTableCell levelCell = visibleCell as LevelListTableCell;
+                foreach (var dataCell in customListTableData.data)
+                {
+                    if (ReflectionUtil.GetField<TextMeshProUGUI, LevelListTableCell>(levelCell, "_songNameText")?.text == dataCell.text)
+                    {
+                        if (dataCell.icon == null) continue;
+                        var image = ReflectionUtil.GetField<Image, LevelListTableCell>(levelCell, "_coverImage");
+
+                        if (dataCell.icon.name.EndsWith(".gif"))
+                        {
+                            var foundAnimation = AnimationController.instance.RegisteredAnimations.FirstOrDefault(x => x.Key == dataCell.icon.name);
+                            if (foundAnimation.Value != null)
+                            {
+                                /*if (foundAnimation.Value.activeImages.Count > 0)
+                                {
+                                    Plugin.Log.Info("OH NO");
+                                }
+                                List<Image> newImagelist = new List<Image>();
+                                newImagelist.Add(image);
+                                image.sprite = foundAnimation.Value.sprites[0];
+                                foundAnimation.Value.activeImages = newImagelist;*/
+                                foundAnimation.Value.activeImages.Add(image);
+                            }
+                        }
+                        else image.sprite = dataCell.icon;
+                        continue;
+                    }
                 }
             }
         }
@@ -222,7 +307,7 @@ namespace ModelDownloader.Settings.UI
         }
 
         [UIComponent("warning-text")]
-        public CurvedTextMeshPro NameText;
+        public CurvedTextMeshPro NameText = null;
 
         bool ignoringWarnings = false;
         internal void DisplayWarningPromptIfNeeded(ModelsaberEntry model)
@@ -264,7 +349,7 @@ namespace ModelDownloader.Settings.UI
         // SORT CODE
         // =========================
         [UIComponent("sourceList")]
-        public CustomListTableData sourceListTableData;
+        public CustomListTableData sourceListTableData = null;
 
         [UIAction("sortPressed")]
         internal void SortPressed()
@@ -287,7 +372,7 @@ namespace ModelDownloader.Settings.UI
         // SEARCH CODE
         // =========================
         [UIComponent("searchKeyboard")]
-        public ModalKeyboard _searchKeyboard;
+        public ModalKeyboard _searchKeyboard = null;
 
         private string _searchValue = "";
         [UIValue("searchValue")]
@@ -310,7 +395,7 @@ namespace ModelDownloader.Settings.UI
         }
 
         [UIComponent("interactableGroup")]
-        VerticalLayoutGroup interactableGroup;
+        VerticalLayoutGroup interactableGroup = null;
 
         [UIAction("searchPressed")]
         internal void SearchPressed(string text)

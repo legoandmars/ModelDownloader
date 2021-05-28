@@ -1,4 +1,6 @@
-﻿using BeatSaberMarkupLanguage.Attributes;
+﻿using BeatSaberMarkupLanguage;
+using BeatSaberMarkupLanguage.Animations;
+using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Notify;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
@@ -6,7 +8,11 @@ using ModelDownloader.Configuration;
 using ModelDownloader.Types;
 using ModelDownloader.Utils;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace ModelDownloader.Settings.UI
@@ -18,6 +24,7 @@ namespace ModelDownloader.Settings.UI
         public Action<string> didClickAuthor;
         public Action<ModelsaberEntry> downloadPressed;
         public Action<ModelsaberEntry> previewPressed;
+        public Action donatePressed;
 
         private bool _downloadInteractable = false;
         private bool _previewInteractable = false;
@@ -30,6 +37,31 @@ namespace ModelDownloader.Settings.UI
         protected void Construct(PluginConfig pluginConfig)
         {
             _pluginConfig = pluginConfig;
+        }
+
+        [UIComponent("donateButton")]
+        public Button donateButton = null;
+
+        [UIAction("donateClicked")]
+        public void DonateClicked()
+        {
+            //parserParams.EmitEvent("close-patreonModal");
+            donateButton.interactable = false;
+            Application.OpenURL("https://www.patreon.com/bobbievr");
+            StartCoroutine(DonateActiveAgain());
+        }
+
+        [UIAction("donateHelpClicked")]
+        public void DonateHelpClicked()
+        {
+            donatePressed?.Invoke();
+            // parserParams.EmitEvent("open-patreonModal");
+        }
+        private IEnumerator DonateActiveAgain()
+        {
+            yield return new WaitForSeconds(3);
+            donateButton.interactable = true;
+            // openedText.gameObject.SetActive(false);
         }
 
         [UIValue("downloadInteractable")]
@@ -65,13 +97,13 @@ namespace ModelDownloader.Settings.UI
         }
 
         [UIComponent("thumbnail")]
-        public ImageView Thumbnail;
+        public ImageView Thumbnail = null;
 
         [UIComponent("name")]
-        public CurvedTextMeshPro NameText;
+        public CurvedTextMeshPro NameText = null;
 
         [UIComponent("author-name")]
-        public CurvedTextMeshPro AuthorText;
+        public CurvedTextMeshPro AuthorText = null;
 
         internal void SetupDetailView()
         {
@@ -79,8 +111,13 @@ namespace ModelDownloader.Settings.UI
 
         internal void Initialize(ModelsaberEntry model, Sprite cover) {
             _currentModel = model;
-
             Thumbnail.sprite = cover;
+
+            if (model.Thumbnail.EndsWith(".gif"))
+            {
+                var foundAnimation = AnimationController.instance.RegisteredAnimations.FirstOrDefault(x => x.Key == model.Id.ToString() + ".gif");
+                if (foundAnimation.Value != null) foundAnimation.Value.activeImages.Add(Thumbnail);
+            }
             NameText.text = model.Name;
             AuthorText.text = model.Author;
 

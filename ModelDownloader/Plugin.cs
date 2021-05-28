@@ -3,6 +3,7 @@ using IPA.Config;
 using IPA.Config.Stores;
 using IPALogger = IPA.Logging.Logger;
 using ModelDownloader.Configuration;
+using ModelDownloader.HarmonyPatches;
 using ModelDownloader.Installers;
 using ModelDownloader.Utils;
 using SiraUtil.Zenject;
@@ -36,6 +37,7 @@ namespace ModelDownloader
             Log.Debug("OnApplicationStart");
             DownloadUtils.CheckDownloadedFiles();
             ModUtils.CheckInstalledMods();
+            ModelDownloaderPatches.ApplyHarmonyPatches();
         }
 
         [OnExit]

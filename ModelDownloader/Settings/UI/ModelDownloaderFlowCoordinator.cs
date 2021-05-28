@@ -26,6 +26,7 @@ namespace ModelDownloader.Settings.UI
             _modelDetail.didClickAuthor += HandleDidSelectAuthor;
             _modelDetail.downloadPressed += HandleDownload;
             _modelDetail.previewPressed += HandlePreview;
+            _modelDetail.donatePressed += HandleDonate;
         }
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
@@ -71,7 +72,6 @@ namespace ModelDownloader.Settings.UI
             _modelList.ClearData();
             _modelList.GetModelPages(0);
         }
-
         internal void HandleDownload(ModelsaberEntry model)
         {
 
@@ -81,6 +81,10 @@ namespace ModelDownloader.Settings.UI
         internal void HandlePreview(ModelsaberEntry model)
         {
             _modelPreview.CreatePreview(model);
+        }
+        internal void HandleDonate()
+        {
+            _modelList.OpenDonateModal();
         }
     }
 }

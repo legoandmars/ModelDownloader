@@ -32,6 +32,23 @@
         </horizontal>
       </vertical>
     </modal>
+    <modal id='patreonModal' show-event='open-patreonModal' hide-event='close-patreonModal,closeAllModals' move-to-center='true' size-delta-y='45' size-delta-x='80'>
+      <vertical>
+        <horizontal bg='panel-top' pad-left='10' pad-right='10' horizontal-fit='PreferredSize'>
+          <image src='ModelDownloader.Settings.UI.Resources.patreon.png' preserve-aspect='true' pref-width='6' pref-height='6' anchor-pos-x='-3' anchor-pos-y='-10'/>
+          <text text='Patreon' align='Center' font-size='7' />
+        </horizontal>
+        <vertical horizontal-fit='PreferredSize' vertical-fit='Unconstrained'>
+          <vertical pref-width='75' horizontal-fit='PreferredSize' vertical-fit='PreferredSize'>
+            <text id='patreon-text' text='If you enjoy this mod, please consider supporting me on patreon. I spend an extremely large portion of my time creating mods, and having people support me allows me to continue to put out high quality mods for free.' align='Center' word-wrapping='true' />
+          </vertical>
+        </vertical>
+        <horizontal pref-width='50' horizontal-fit='PreferredSize' vertical-fit='PreferredSize' spacing='2' anchor-pos-y='50' >
+          <button id='closeButton' on-click='closePressed' text="Close" pad='0' pref-height='8' pref-width='20' anchor-pos-y='25'></button>
+          <button id='modalDonateButton' on-click='donateClicked' text='Donate' pad='0' pref-height='8' pref-width='30' anchor-pos-y='25'></button>
+        </horizontal>
+      </vertical>
+    </modal>
     <page-button event-click="list#PageUp" on-click="pageUpPressed" direction="Up"></page-button>
     <list id="list" expand-cell="true" select-cell="listSelect">
     </list>

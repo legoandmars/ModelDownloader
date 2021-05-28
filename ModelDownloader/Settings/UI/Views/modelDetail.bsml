@@ -1,4 +1,4 @@
-﻿<div horizontal-fit="PreferredSize" vertical-fit="PreferredSize" anchor-pos-y="6">
+﻿<div horizontal-fit="PreferredSize" vertical-fit="PreferredSize" anchor-pos-y="-2">
   <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
     <img preserve-aspect="true" id="thumbnail" pref-width="50" pref-height="50"></img>
     <horizontal>
@@ -9,6 +9,13 @@
     <horizontal pref-width="50" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="2">
       <button id="downloadButton" interactable="~downloadInteractable"  on-click="downloadPressed" text="Download" pad="0" pref-height="8" pref-width="25" anchor-pos-y="25"></button>
       <button id="previewButton" interactable="~previewInteractable" on-click="previewPressed" text="Preview" pad="0" pref-height="8" pref-width="25" anchor-pos-y="25"></button>
+    </horizontal>
+  </vertical>
+  <vertical ignore-layout='true' anchor-pos-x='12' anchor-pos-y='39'>
+    <horizontal horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
+      <button id='donateButton' text='Donate' on-click='donateClicked' pref-width='17.5' pref-height="10"></button>
+      <primary-button text='?' on-click='donateHelpClicked' pref-width='10' pref-height="10"></primary-button>
+    
     </horizontal>
   </vertical>
 </div>

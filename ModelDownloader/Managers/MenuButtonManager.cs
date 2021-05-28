@@ -11,11 +11,14 @@ namespace ModelDownloader.Managers
         private readonly MenuButton _menuButton;
         private readonly MainFlowCoordinator _mainFlowCoordinator;
         private readonly ModelDownloaderFlowCoordinator _modelFlowCoordinator;
+        private readonly GameplaySetupViewController _gameplaySetupViewController;
 
-        public MenuButtonManager(MainFlowCoordinator mainFlowCoordinator, ModelDownloaderFlowCoordinator modelFlowCoordinator)
+        public MenuButtonManager(MainFlowCoordinator mainFlowCoordinator, ModelDownloaderFlowCoordinator modelFlowCoordinator, GameplaySetupViewController gameplaySetupViewController)
         {
             _mainFlowCoordinator = mainFlowCoordinator;
             _modelFlowCoordinator = modelFlowCoordinator;
+            _gameplaySetupViewController = gameplaySetupViewController;
+
             _menuButton = new MenuButton("More Models", "Download models from ModelSaber.com", ShowModelFlow, true);
         }
 

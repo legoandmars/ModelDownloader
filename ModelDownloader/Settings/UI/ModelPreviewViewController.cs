@@ -17,14 +17,14 @@ namespace ModelDownloader.Settings.UI
         public override string ResourceName => "ModelDownloader.Settings.UI.Views.modelPreview.bsml";
 
         [Inject]
-        protected readonly ColorManager _colorManager;
+        private GameplaySetupViewController _gameplaySetupViewController = null;
 
         private ModelsaberEntry _model;
         private GameObject _previewHolder;
         private AssetBundle _bundle;
 
         [UIComponent("loading-text")]
-        public CurvedTextMeshPro LoadingText;
+        public CurvedTextMeshPro LoadingText = null;
 
         internal void ClearData()
         {
@@ -77,10 +77,10 @@ namespace ModelDownloader.Settings.UI
             PositionPreviewSaber(saberRightPos, previewSabers?.transform.Find("RightSaber").gameObject);
 
             previewSabers?.transform.Find("LeftSaber").gameObject.SetActive(true);
-            ColorizeSaber(previewSabers?.transform.Find("LeftSaber").gameObject, _colorManager.ColorForSaberType(SaberType.SaberA));
+            ColorizeSaber(previewSabers?.transform.Find("LeftSaber").gameObject, _gameplaySetupViewController.colorSchemesSettings.GetSelectedColorScheme().saberAColor);
             //previewSabers?.transform.Find("LeftSaber").gameObject.gameObject.AddComponent<DummySaber>();
             previewSabers?.transform.Find("RightSaber").gameObject.SetActive(true);
-            ColorizeSaber(previewSabers?.transform.Find("RightSaber").gameObject, _colorManager.ColorForSaberType(SaberType.SaberB));
+            ColorizeSaber(previewSabers?.transform.Find("RightSaber").gameObject, _gameplaySetupViewController.colorSchemesSettings.GetSelectedColorScheme().saberBColor);
             //previewSabers?.transform.Find("RightSaber").gameObject.gameObject.AddComponent<DummySaber>();
         }
 
@@ -147,10 +147,10 @@ namespace ModelDownloader.Settings.UI
             GameObject noteDotRight = CreatePreviewNote(NoteDotRight, transform, rightDotPos);
             GameObject noteBomb = CreatePreviewNote(NoteBomb, transform, bombPos);
 
-            ColorizeCustomNote(_colorManager.ColorForSaberType(SaberType.SaberA), 1, noteLeft);
-            ColorizeCustomNote(_colorManager.ColorForSaberType(SaberType.SaberA), 1, noteDotLeft);
-            ColorizeCustomNote(_colorManager.ColorForSaberType(SaberType.SaberB), 1, noteRight);
-            ColorizeCustomNote(_colorManager.ColorForSaberType(SaberType.SaberB), 1, noteDotRight);
+            ColorizeCustomNote(_gameplaySetupViewController.colorSchemesSettings.GetSelectedColorScheme().saberAColor, 1, noteLeft);
+            ColorizeCustomNote(_gameplaySetupViewController.colorSchemesSettings.GetSelectedColorScheme().saberAColor, 1, noteDotLeft);
+            ColorizeCustomNote(_gameplaySetupViewController.colorSchemesSettings.GetSelectedColorScheme().saberBColor, 1, noteRight);
+            ColorizeCustomNote(_gameplaySetupViewController.colorSchemesSettings.GetSelectedColorScheme().saberBColor, 1, noteDotRight);
             // todo fake arrows
         }
         private GameObject CreatePreviewNote(GameObject note, Transform transform, Vector3 localPosition)
