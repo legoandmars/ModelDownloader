@@ -13,13 +13,13 @@ namespace ModelDownloader.HarmonyPatches.Patches
     {
         private static void Prefix(AnimationControllerData __instance)
         {
-            if (__instance.sprite.name.StartsWith("ModelDownloaderAnimation"))
+            if (__instance != null && __instance.sprite != null && __instance.activeImages != null && __instance.sprite.name.StartsWith("ModelDownloaderAnimation"))
             {
                 var newImageList = new List<Image>();
-
-                foreach (var activeImage in __instance.activeImages)
+                for (int i = 0; i < __instance.activeImages.Count; i++)
                 {
-                    if (__instance.sprites.Contains(activeImage.sprite)) newImageList.Add(activeImage);
+                    var activeImage = __instance.activeImages[i];
+                    if (activeImage && __instance.sprites.Contains(activeImage.sprite)) newImageList.Add(activeImage);
                 }
                 __instance.activeImages = newImageList;
             }

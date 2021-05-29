@@ -123,7 +123,7 @@ namespace ModelDownloader.Settings.UI
 
             DownloadInteractable = !DownloadUtils.CheckIfModelInstalled(model);
             PreviewInteractible = !DownloadUtils.CheckIfModelInstalled(model) && (model.Type != "platform" && model.Type != "avatar");
-            Plugin.Log.Info(_pluginConfig.AutomaticallyGeneratePreviews.ToString());
+            // Plugin.Log.Info(_pluginConfig.AutomaticallyGeneratePreviews.ToString());
             if (_pluginConfig.AutomaticallyGeneratePreviews && PreviewInteractible) PreviewPressed();
         }
 
