@@ -12,22 +12,23 @@ namespace ModelDownloader.Settings.UI
         private ModelListViewController _modelList;
         private ModelDetailViewController _modelDetail;
         private ModelPreviewViewController _modelPreview;
-        private NavigationController _modelNavigationController;
 
         [Inject]
-        public void Construct(MainFlowCoordinator mainFlow, ModelListViewController modelList, ModelDetailViewController modelDetail, NavigationController modelNavigationController, ModelPreviewViewController modelPreview)
+        public void Construct(MainFlowCoordinator mainFlow, ModelListViewController modelList, ModelDetailViewController modelDetail, ModelPreviewViewController modelPreview)
         {
             _mainFlow = mainFlow;
             _modelList = modelList;
             _modelDetail = modelDetail;
             _modelPreview = modelPreview;
-            _modelNavigationController = modelNavigationController;
             _modelList.didSelectModel += HandleDidSelectModel;
             _modelDetail.didClickAuthor += HandleDidSelectAuthor;
             _modelDetail.downloadPressed += HandleDownload;
             _modelDetail.previewPressed += HandlePreview;
             _modelDetail.donatePressed += HandleDonate;
         }
+
+        [Inject(Id = "com.legoandmars.modeldownloader.navigationcontroller")]
+        private NavigationController _modelNavigationController;
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {

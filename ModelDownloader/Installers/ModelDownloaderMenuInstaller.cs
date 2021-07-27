@@ -13,7 +13,7 @@ namespace ModelDownloader.Installers
             Container.Bind<ModelListViewController>().FromNewComponentAsViewController().AsSingle();
             Container.Bind<ModelDetailViewController>().FromNewComponentAsViewController().AsSingle();
             Container.Bind<ModelPreviewViewController>().FromNewComponentAsViewController().AsSingle();
-            Container.Bind<NavigationController>().FromNewComponentAsViewController().AsSingle();
+            Container.Bind<NavigationController>().WithId("com.legoandmars.modeldownloader.navigationcontroller").FromNewComponentAsViewController().AsCached();
             Container.Bind<ModelDownloaderFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
 
             Container.BindInterfacesTo<MenuButtonManager>().AsSingle();
