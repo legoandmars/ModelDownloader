@@ -13,7 +13,6 @@ namespace ModelDownloader
     [Plugin(RuntimeOptions.SingleStartInit)]
     public class Plugin
     {
-        internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
 
         [Init]
@@ -24,11 +23,10 @@ namespace ModelDownloader
         /// </summary>
         public void Init(IPALogger logger, Config config, Zenjector zenjector)
         {
-            Instance = this;
             Log = logger;
             Log.Info("ModelDownloader initialized.");
-            zenjector.OnApp<ModelDownloaderCoreInstaller>().WithParameters(config.Generated<PluginConfig>());
-            zenjector.OnMenu<ModelDownloaderMenuInstaller>();
+            zenjector.Install<ModelDownloaderCoreInstaller>(Location.App,config.Generated<PluginConfig>());
+            zenjector.Install<ModelDownloaderMenuInstaller>(Location.Menu);
         }
 
         [OnStart]
