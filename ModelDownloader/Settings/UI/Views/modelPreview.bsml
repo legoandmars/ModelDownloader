@@ -1,8 +1,9 @@
-﻿<vertical child-control-height='false' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  <horizontal bg='panel-top' pad-left='10' pad-right='10' horizontal-fit='PreferredSize'>
-    <text text='Model Preview' align='Center' font-size='10' />
-  </horizontal>
-  <horizontal>
-    <text id='loading-text' text='' align='Center' font-size='8'/>
-  </horizontal>
+﻿<vertical xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
+          child-control-height='false'>
+    <horizontal bg='panel-top' pad-left='10' pad-right='10' horizontal-fit='PreferredSize'>
+        <text text='Model Preview' align='Center' font-size='10'/>
+    </horizontal>
+    <horizontal>
+        <text id='loading-text' text='' align='Center' font-size='8'/>
+    </horizontal>
 </vertical>

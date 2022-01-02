@@ -1,5 +1,5 @@
-﻿<settings-container>
-  <checkbox-setting text='Blur NSFW Images' value='blur-images' apply-on-change='true'/>
-  <checkbox-setting text='Disable Warnings' value='disable-warnings' apply-on-change='true'/>
-  <checkbox-setting text='Automatically Generate Previews' value='autogen-previews' apply-on-change='true'/>
+﻿<settings-container xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+    <checkbox-setting text='Blur NSFW Images' value='blur-images' apply-on-change='true'/>
+    <checkbox-setting text='Disable Warnings' value='disable-warnings' apply-on-change='true'/>
+    <checkbox-setting text='Automatically Generate Previews' value='autogen-previews' apply-on-change='true'/>
 </settings-container>
