@@ -55,7 +55,7 @@ namespace ModelDownloader.Types
         [JsonProperty("date")]
         public string Date { get; set; }
 
-        public async Task<byte[]> GetCoverImageBytes()
+        public async Task<byte[]?> GetCoverImageBytes()
         {
             try
             {

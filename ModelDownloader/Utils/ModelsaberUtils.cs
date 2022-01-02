@@ -3,75 +3,74 @@ using ModelDownloader.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
+using SiraUtil.Web;
 using UnityEngine;
 
 namespace ModelDownloader
 {
-    public static class ModelsaberUtils
+    public class ModelsaberUtils
     {
-        static readonly HttpClient client = new HttpClient();
+        // TODO: Actually inject this thing
+        static readonly IHttpService client;
 
-        public static async Task<List<ModelsaberEntry>> GetPage(ModelsaberSearch searchOptions)
+        public static async Task<List<ModelsaberEntry>?> GetPage(ModelsaberSearch searchOptions)
         {
-            client.BaseAddress = new Uri("https://modelsaber.com/api/v2/");
             // Call asynchronous network methods in a try/catch block to handle exceptions.
-            try
+
+            string sortString = "";
+            switch (searchOptions.ModelSort)
             {
-                string sortString = "";
-                switch (searchOptions.ModelSort)
-                {
-                    case ModelsaberSearchSort.Newest:
-                        sortString = "&sort=date&sortDirection=desc";
-                        break;
-                    case ModelsaberSearchSort.Oldest:
-                        sortString = "&sort=date&sortDirection=asc";
-                        break;
-                    case ModelsaberSearchSort.Name:
-                        sortString = "&sort=name&sortDirection=asc";
-                        break;
-                    case ModelsaberSearchSort.Author:
-                        sortString = "&sort=author&sortDirection=asc";
-                        break;
-                }
-
-                string constructedURL =
-                    $"get.php?type={(searchOptions.ModelType).ToString().ToLower()}&start={searchOptions.Page * searchOptions.PageLength}&end={(searchOptions.Page + 1) * searchOptions.PageLength}{sortString}";
-                // Plugin.Log.Info(constructedURL);
-                if (!string.IsNullOrWhiteSpace(searchOptions.Search))
-                {
-                    constructedURL += "&filter=" + searchOptions.Search;
-                }
-
-                HttpResponseMessage response = await client.GetAsync(constructedURL);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-                // Plugin.Log.Info(responseBody);
-                Dictionary<string, ModelsaberEntry> modelPageResponse = JsonConvert.DeserializeObject<Dictionary<string, ModelsaberEntry>>(responseBody);
-
-                return modelPageResponse.Values.ToList();
+                case ModelsaberSearchSort.Newest:
+                    sortString = "&sort=date&sortDirection=desc";
+                    break;
+                case ModelsaberSearchSort.Oldest:
+                    sortString = "&sort=date&sortDirection=asc";
+                    break;
+                case ModelsaberSearchSort.Name:
+                    sortString = "&sort=name&sortDirection=asc";
+                    break;
+                case ModelsaberSearchSort.Author:
+                    sortString = "&sort=author&sortDirection=asc";
+                    break;
             }
-            catch (HttpRequestException e)
+
+            string constructedURL = $"https://modelsaber.com/api/v2/get.php?type={(searchOptions.ModelType).ToString().ToLower()}&start={searchOptions.Page * searchOptions.PageLength}&end={(searchOptions.Page + 1) * searchOptions.PageLength}{sortString}";
+            // Plugin.Log.Info(constructedURL);
+            if (!string.IsNullOrWhiteSpace(searchOptions.Search))
             {
-                Plugin.Log.Info("\nException Caught!");
-                Plugin.Log.Info("Message : " + e.Message);
+                constructedURL += "&filter=" + searchOptions.Search;
+            }
+
+            IHttpResponse response = await client.GetAsync(constructedURL);
+            if (!response.Successful)
+            {
+                Plugin.Log.Warn($"Call to endpoint: {constructedURL} returned an unsuccessful status code {response.Code}");
                 return null;
             }
+
+            string responseBody = await response.ReadAsStringAsync();
+
+            // Plugin.Log.Info(responseBody);
+            Dictionary<string, ModelsaberEntry> modelPageResponse = JsonConvert.DeserializeObject<Dictionary<string, ModelsaberEntry>>(responseBody);
+
+            return modelPageResponse.Values.ToList();
         }
 
-        public static async Task<byte[]> GetCoverImageBytes(ModelsaberEntry entry)
+        public static async Task<byte[]?> GetCoverImageBytes(ModelsaberEntry? entry)
         {
-            if (entry == null) return null;
-            Uri thumbnailURL;
-            if (!Uri.TryCreate(entry.Thumbnail, UriKind.Absolute, out thumbnailURL))
+            if (entry == null)
             {
-                thumbnailURL = new Uri(entry.Download.Substring(0, entry.Download.LastIndexOf("/")) + "/" + entry.Thumbnail);
+                return null;
             }
 
-            client.BaseAddress = null;
-            HttpResponseMessage response = await client.GetAsync(thumbnailURL);
+            var thumbnailUrl = entry.Thumbnail;
+            if (!Uri.TryCreate(thumbnailUrl, UriKind.Absolute, out _))
+            {
+                thumbnailUrl = thumbnailUrl.Substring(0, entry.Download.LastIndexOf('/')) + '/' + entry.Thumbnail;
+            }
+
+            var response = await client.GetAsync(thumbnailUrl);
 
             // GIF loading code doesn't work, fix it later. it's pretty scuffed anyways, maybe just make it actually work as a gif...
             /*if (thumbnailURL.ToString().EndsWith(".gif"))
@@ -96,24 +95,27 @@ namespace ModelDownloader
                     return source.Task;
                 });
             }*/
-            return await response.Content.ReadAsByteArrayAsync();
+            return await response.ReadAsByteArrayAsync();
         }
 
         public static Dictionary<int, byte[]> modelDownloadCache = new Dictionary<int, byte[]>();
 
-        public static async Task<byte[]> GetModelBytes(ModelsaberEntry entry)
+        public static async Task<byte[]?> GetModelBytes(ModelsaberEntry? entry)
         {
-            if (entry == null) return null;
-            if (modelDownloadCache.ContainsKey(entry.Id)) return modelDownloadCache[entry.Id];
-            Uri downloadURL;
-            if (!Uri.TryCreate(entry.Download, UriKind.Absolute, out downloadURL))
+            if (entry == null)
             {
-                downloadURL = new Uri(entry.Download.Substring(0, entry.Download.LastIndexOf("/")) + "/" + entry.Download);
+                return null;
             }
 
-            client.BaseAddress = null;
-            HttpResponseMessage response = await client.GetAsync(downloadURL);
-            byte[] modelBytes = await response.Content.ReadAsByteArrayAsync();
+            if (modelDownloadCache.ContainsKey(entry.Id)) return modelDownloadCache[entry.Id];
+            string downloadUrl = entry.Download;
+            if (!Uri.TryCreate(downloadUrl, UriKind.Absolute, out _))
+            {
+                downloadUrl = entry.Download.Substring(0, entry.Download.LastIndexOf("/")) + "/" + entry.Download;
+            }
+
+            var response = await client.GetAsync(downloadUrl);
+            byte[] modelBytes = await response.ReadAsByteArrayAsync();
 
             modelDownloadCache.Add(entry.Id, modelBytes);
             return modelBytes;
