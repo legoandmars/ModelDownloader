@@ -12,10 +12,10 @@ using Zenject;
 
 namespace ModelDownloader.Settings.UI
 {
-    internal class ModelPreviewViewController : BSMLResourceViewController
+    [HotReload(RelativePathToLayout = @"./Views/modelPreview.bsml")]
+    [ViewDefinition("ModelDownloader.Settings.UI.Views.modelPreview.bsml")]
+    internal class ModelPreviewViewController : BSMLAutomaticViewController
     {
-        public override string ResourceName => "ModelDownloader.Settings.UI.Views.modelPreview.bsml";
-
         private GameplaySetupViewController _gameplaySetupViewController = null!;
         private DownloadUtils _downloadUtils = null!;
         private ModUtils _modUtils = null!;

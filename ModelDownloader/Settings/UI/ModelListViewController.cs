@@ -17,10 +17,10 @@ using Zenject;
 
 namespace ModelDownloader.Settings.UI
 {
-    internal class ModelListViewController : BSMLResourceViewController
+    [HotReload(RelativePathToLayout = @"./Views/modelList.bsml")]
+    [ViewDefinition("ModelDownloader.Settings.UI.Views.modelList.bsml")]
+    internal class ModelListViewController : BSMLAutomaticViewController
     {
-        public override string ResourceName => "ModelDownloader.Settings.UI.Views.modelList.bsml";
-
         public LoadingControl loadingSpinner;
         public int currentPage = 0;
         public ModelsaberSearchSort currentSort = 0;
@@ -35,7 +35,6 @@ namespace ModelDownloader.Settings.UI
         private ModelSaberUtils _modelSaberUtils = null!;
         private DiContainer _container = null!;
         private KawaseBlurRendererSO _kawaseBlurRenderer = null!;
-
 
         [UIParams]
         internal BeatSaberMarkupLanguage.Parser.BSMLParserParams parserParams = null!;

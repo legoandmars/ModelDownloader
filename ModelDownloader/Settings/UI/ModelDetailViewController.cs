@@ -15,7 +15,9 @@ using Zenject;
 
 namespace ModelDownloader.Settings.UI
 {
-    internal class ModelDetailViewController : BSMLResourceViewController
+    [HotReload(RelativePathToLayout = @"./Views/modelDetail.bsml")]
+    [ViewDefinition("ModelDownloader.Settings.UI.Views.modelDetail.bsml")]
+    internal class ModelDetailViewController : BSMLAutomaticViewController
     {
         private SiraLog _siraLog = null!;
         private PluginConfig _pluginConfig = null!;
@@ -25,8 +27,6 @@ namespace ModelDownloader.Settings.UI
         
         private bool _downloadInteractable = false;
         private bool _previewInteractable = false;
-
-        public override string ResourceName => "ModelDownloader.Settings.UI.Views.modelDetail.bsml";
 
         public Action<string> didClickAuthor;
         public Action<ModelSaberEntry> downloadPressed;
