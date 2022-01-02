@@ -11,7 +11,7 @@ namespace ModelDownloader.Utils
     /// </remark>
     internal static class SpriteUtils
     {
-        public static Texture2D LoadTextureRaw(byte[] file)
+        public static Texture2D? LoadTextureRaw(byte[] file)
         {
             if (!file.Any())
             {
@@ -22,19 +22,19 @@ namespace ModelDownloader.Utils
             return tex2d.LoadImage(file) ? tex2d : null;
         }
 
-        public static Texture2D LoadTextureFromFile(string filePath)
+        public static Texture2D? LoadTextureFromFile(string filePath)
         {
             return File.Exists(filePath) ? LoadTextureRaw(File.ReadAllBytes(filePath)) : null;
         }
 
-        public static Sprite LoadSpriteRaw(byte[] image, float pixelsPerUnit = 100.0f)
+        public static Sprite? LoadSpriteRaw(byte[] image, float pixelsPerUnit = 100.0f)
         {
             return LoadSpriteFromTexture(LoadTextureRaw(image), pixelsPerUnit);
         }
 
-        public static Sprite LoadSpriteFromTexture(Texture2D spriteTexture, float pixelsPerUnit = 100.0f)
+        public static Sprite? LoadSpriteFromTexture(Texture2D? spriteTexture, float pixelsPerUnit = 100.0f)
         {
-            return spriteTexture ? Sprite.Create(spriteTexture, new Rect(0, 0, spriteTexture.width, spriteTexture.height), new Vector2(0, 0), pixelsPerUnit) : null;
+            return spriteTexture != null ? Sprite.Create(spriteTexture, new Rect(0, 0, spriteTexture.width, spriteTexture.height), new Vector2(0, 0), pixelsPerUnit) : null;
         }
 
         public static async Task<AnimationControllerData> LoadSpriteRawAnimated(byte[] image, string identifier, float pixelsPerUnit = 100.0f)
