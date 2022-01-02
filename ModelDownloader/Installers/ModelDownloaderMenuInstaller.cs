@@ -1,7 +1,6 @@
 ﻿using HMUI;
 using ModelDownloader.Managers;
 using ModelDownloader.Settings.UI;
-using SiraUtil;
 using Zenject;
 
 namespace ModelDownloader.Installers

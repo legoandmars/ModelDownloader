@@ -61,7 +61,7 @@ namespace ModelDownloader.Types
             {
                 return await ModelsaberUtils.GetCoverImageBytes(this);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Plugin.Log.Error("FAILED TO GET COVER IMAGE:");
                 Plugin.Log.Error(e);
@@ -69,6 +69,5 @@ namespace ModelDownloader.Types
                 return null;
             }
         }
-
     }
 }

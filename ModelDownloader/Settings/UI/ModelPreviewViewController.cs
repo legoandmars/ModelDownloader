@@ -28,16 +28,21 @@ namespace ModelDownloader.Settings.UI
 
         internal void ClearData()
         {
-            if(LoadingText != null) LoadingText.text = "";
+            if (LoadingText != null) LoadingText.text = "";
             if (_previewHolder != null)
             {
                 Destroy(_previewHolder);
                 _previewHolder = null;
             }
-            if(_bundle != null) _bundle.Unload(true);
+
+            if (_bundle != null)
+            {
+                _bundle.Unload(true);
+            }
         }
 
-        internal async void CreatePreview(ModelsaberEntry model) {
+        internal async void CreatePreview(ModelsaberEntry model)
+        {
             ClearData();
             LoadingText.text = "Loading Preview...";
             _model = model;
@@ -48,7 +53,7 @@ namespace ModelDownloader.Settings.UI
             _previewHolder.transform.rotation = Quaternion.identity;
 
             AssetBundle bundle = await DownloadUtils.DownloadModelAsPreview(model);
-            if(bundle == null) return;
+            if (bundle == null) return;
             _bundle = bundle;
             if (model.Type == "saber")
             {
@@ -60,8 +65,10 @@ namespace ModelDownloader.Settings.UI
                 GameObject notes = bundle.LoadAsset<GameObject>("assets/_customnote.prefab");
                 CreateNotePreview(notes);
             }
+
             LoadingText.text = "";
         }
+
         // SABER PREVIEW UTILS
         private void CreateSaberPreview(GameObject saber)
         {
@@ -92,6 +99,7 @@ namespace ModelDownloader.Settings.UI
             PositionPreviewSaber(localPosition, saberObject);
             return saberObject;
         }
+
         private void PositionPreviewSaber(Vector3 vector, GameObject saberObject)
         {
             if (saberObject && vector != null)
@@ -99,6 +107,7 @@ namespace ModelDownloader.Settings.UI
                 saberObject.transform.localPosition = vector;
             }
         }
+
         private void ColorizeSaber(GameObject saber, Color color)
         {
             foreach (var r in saber.GetComponentsInChildren<Renderer>())
@@ -111,7 +120,7 @@ namespace ModelDownloader.Settings.UI
                             renderMaterial.SetColor("_Color", color);
                     }
                     else if (renderMaterial.HasProperty("_Glow") && renderMaterial.GetFloat("_Glow") > 0
-                        || renderMaterial.HasProperty("_Bloom") && renderMaterial.GetFloat("_Bloom") > 0)
+                             || renderMaterial.HasProperty("_Bloom") && renderMaterial.GetFloat("_Bloom") > 0)
                     {
                         renderMaterial.SetColor("_Color", color);
                     }
@@ -122,7 +131,6 @@ namespace ModelDownloader.Settings.UI
         // NOTE PREVIEW UTILS
         private void CreateNotePreview(GameObject note)
         {
-
             Vector3 leftDotPos = new Vector3(0.0f, 1.5f, 0.0f);
             Vector3 leftArrowPos = new Vector3(0.0f, 0.0f, 0.0f);
             Vector3 rightDotPos = new Vector3(1.5f, 1.5f, 0.0f);
@@ -153,6 +161,7 @@ namespace ModelDownloader.Settings.UI
             ColorizeCustomNote(_gameplaySetupViewController.colorSchemesSettings.GetSelectedColorScheme().saberBColor, 1, noteDotRight);
             // todo fake arrows
         }
+
         private GameObject CreatePreviewNote(GameObject note, Transform transform, Vector3 localPosition)
         {
             GameObject noteObject = InstantiateGameObject(note, transform);
@@ -166,8 +175,10 @@ namespace ModelDownloader.Settings.UI
             {
                 return transform ? Instantiate(gameObject, transform) : Instantiate(gameObject);
             }
+
             return null;
         }
+
         private void PositionPreviewNote(Vector3 vector, GameObject noteObject)
         {
             if (noteObject && vector != null)
@@ -179,6 +190,7 @@ namespace ModelDownloader.Settings.UI
                 //noteObject.transform.localRotation = Quaternion.identity;
             }
         }
+
         public static void ColorizeCustomNote(Color color, float colorStrength, GameObject noteObject)
         {
             Type disableNoteColorType = null;
@@ -186,6 +198,7 @@ namespace ModelDownloader.Settings.UI
             {
                 disableNoteColorType = PluginManager.EnabledPlugins.Where(x => x.Name == "CustomNotes").FirstOrDefault().Assembly.GetType("CustomNotes.DisableNoteColorOnGameobject");
             }
+
             if (!noteObject || color == null)
             {
                 return;
@@ -198,7 +211,7 @@ namespace ModelDownloader.Settings.UI
             {
                 bool colorDisabled = false;
 
-                if(disableNoteColorType != null)
+                if (disableNoteColorType != null)
                 {
                     colorDisabled = childTransform.GetComponent(disableNoteColorType);
                 }
@@ -220,6 +233,5 @@ namespace ModelDownloader.Settings.UI
             ClearData();
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
         }
-
     }
 }

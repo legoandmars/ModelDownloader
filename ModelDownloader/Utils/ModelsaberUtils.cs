@@ -35,12 +35,15 @@ namespace ModelDownloader
                         sortString = "&sort=author&sortDirection=asc";
                         break;
                 }
-                string constructedURL = $"get.php?type={(searchOptions.ModelType).ToString().ToLower()}&start={searchOptions.Page * searchOptions.PageLength}&end={(searchOptions.Page + 1) * searchOptions.PageLength}{sortString}";
+
+                string constructedURL =
+                    $"get.php?type={(searchOptions.ModelType).ToString().ToLower()}&start={searchOptions.Page * searchOptions.PageLength}&end={(searchOptions.Page + 1) * searchOptions.PageLength}{sortString}";
                 // Plugin.Log.Info(constructedURL);
                 if (!string.IsNullOrWhiteSpace(searchOptions.Search))
                 {
                     constructedURL += "&filter=" + searchOptions.Search;
                 }
+
                 HttpResponseMessage response = await client.GetAsync(constructedURL);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -62,10 +65,11 @@ namespace ModelDownloader
         {
             if (entry == null) return null;
             Uri thumbnailURL;
-            if(!Uri.TryCreate(entry.Thumbnail, UriKind.Absolute, out thumbnailURL))
+            if (!Uri.TryCreate(entry.Thumbnail, UriKind.Absolute, out thumbnailURL))
             {
                 thumbnailURL = new Uri(entry.Download.Substring(0, entry.Download.LastIndexOf("/")) + "/" + entry.Thumbnail);
             }
+
             client.BaseAddress = null;
             HttpResponseMessage response = await client.GetAsync(thumbnailURL);
 
@@ -94,7 +98,9 @@ namespace ModelDownloader
             }*/
             return await response.Content.ReadAsByteArrayAsync();
         }
+
         public static Dictionary<int, byte[]> modelDownloadCache = new Dictionary<int, byte[]>();
+
         public static async Task<byte[]> GetModelBytes(ModelsaberEntry entry)
         {
             if (entry == null) return null;
@@ -104,6 +110,7 @@ namespace ModelDownloader
             {
                 downloadURL = new Uri(entry.Download.Substring(0, entry.Download.LastIndexOf("/")) + "/" + entry.Download);
             }
+
             client.BaseAddress = null;
             HttpResponseMessage response = await client.GetAsync(downloadURL);
             byte[] modelBytes = await response.Content.ReadAsByteArrayAsync();

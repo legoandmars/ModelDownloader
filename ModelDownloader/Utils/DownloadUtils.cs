@@ -1,4 +1,5 @@
-﻿using IPA.Utilities;
+﻿using System;
+using IPA.Utilities;
 using ModelDownloader.Types;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +23,7 @@ namespace ModelDownloader.Utils
             IEnumerable<string> saberFilter = new List<string> { "*.saber" };
             InstalledSabers = GetFileNames(Path.Combine(UnityGame.InstallPath, "CustomSabers"), saberFilter, SearchOption.AllDirectories, true);
 
-            IEnumerable<string> noteFilter = new List<string> { "*.bloq"};
+            IEnumerable<string> noteFilter = new List<string> { "*.bloq" };
             InstalledBloqs = GetFileNames(Path.Combine(UnityGame.InstallPath, "CustomNotes"), noteFilter, SearchOption.AllDirectories, true);
 
             IEnumerable<string> avatarFilter = new List<string> { "*.avatar" };
@@ -34,23 +35,23 @@ namespace ModelDownloader.Utils
 
         public static bool CheckIfModelInstalled(ModelsaberEntry model)
         {
-            string modelFileName = model.Download.Substring(model.Download.LastIndexOf("/") + 1);
+            string modelFileName = model.Download.Substring(model.Download.LastIndexOf('/') + 1);
 
-            if(model.Type == "saber") return InstalledSabers.Contains(modelFileName);
-            else if(model.Type == "bloq") return InstalledBloqs.Contains(modelFileName);
-            else if(model.Type == "avatar") return InstalledAvatars.Contains(modelFileName);
-            else if(model.Type == "platform") return InstalledPlatforms.Contains(modelFileName);
+            if (model.Type == "saber") return InstalledSabers.Contains(modelFileName);
+            else if (model.Type == "bloq") return InstalledBloqs.Contains(modelFileName);
+            else if (model.Type == "avatar") return InstalledAvatars.Contains(modelFileName);
+            else if (model.Type == "platform") return InstalledPlatforms.Contains(modelFileName);
             else return false;
         }
 
         public static void AddToInstalledList(ModelsaberEntry model)
         {
-            string modelFileName = model.Download.Substring(model.Download.LastIndexOf("/") + 1);
+            string modelFileName = model.Download.Substring(model.Download.LastIndexOf('/') + 1);
 
             if (model.Type == "saber") InstalledSabers.Add(modelFileName);
             else if (model.Type == "bloq") InstalledBloqs.Add(modelFileName);
-            else if(model.Type == "avatar") InstalledAvatars.Add(modelFileName);
-            else if(model.Type == "platform") InstalledPlatforms.Add(modelFileName);
+            else if (model.Type == "avatar") InstalledAvatars.Add(modelFileName);
+            else if (model.Type == "platform") InstalledPlatforms.Add(modelFileName);
         }
 
         public static void DownloadModel(ModelsaberEntry model)
@@ -61,13 +62,16 @@ namespace ModelDownloader.Utils
             else if (model.Type == "platform") DownloadModel(model, Path.Combine(UnityGame.InstallPath, "CustomPlatforms"));
         }
 
-        public static async void DownloadModel(ModelsaberEntry model, string DownloadPath)
+        public static async void DownloadModel(ModelsaberEntry model, string downloadDirectoryPath)
         {
             byte[] fileBytes = await ModelsaberUtils.GetModelBytes(model);
-            string modelFileName = model.Download.Substring(model.Download.LastIndexOf("/") + 1);
+            string modelFileName = model.Download.Substring(model.Download.LastIndexOf('/') + 1);
 
             Plugin.Log.Info("Checking hash...");
-            if (model.Hash.ToLower() == MD5Checksum(fileBytes).ToLower()) Plugin.Log.Info($"Hash check for {model.Name} passed!");
+            if (string.Equals(model.Hash, MD5Checksum(fileBytes), StringComparison.OrdinalIgnoreCase))
+            {
+                Plugin.Log.Info($"Hash check for {model.Name} passed!");
+            }
             else
             {
                 Plugin.Log.Error($"HASH CHECK FAILED FOR {model.Name}!");
@@ -75,9 +79,12 @@ namespace ModelDownloader.Utils
             }
 
             // Actually save the file
-            if (!Directory.Exists(DownloadPath)) Directory.CreateDirectory(DownloadPath);
+            if (!Directory.Exists(downloadDirectoryPath))
+            {
+                Directory.CreateDirectory(downloadDirectoryPath);
+            }
 
-            string downloadPath = Path.Combine(DownloadPath, modelFileName);
+            string downloadPath = Path.Combine(downloadDirectoryPath, modelFileName);
             if (!File.Exists(downloadPath))
             {
                 File.WriteAllBytes(downloadPath, fileBytes);
@@ -88,7 +95,7 @@ namespace ModelDownloader.Utils
         public static string MD5Checksum(byte[] inputBytes)
         {
             // Use input string to calculate MD5 hash
-            using (MD5 md5 = MD5.Create())
+            using (var md5 = MD5.Create())
             {
                 byte[] hashBytes = md5.ComputeHash(inputBytes);
 
@@ -98,6 +105,7 @@ namespace ModelDownloader.Utils
                 {
                     sb.Append(hashBytes[i].ToString("X2"));
                 }
+
                 return sb.ToString();
             }
         }
@@ -106,10 +114,13 @@ namespace ModelDownloader.Utils
         public static async Task<AssetBundle> DownloadModelAsPreview(ModelsaberEntry model)
         {
             byte[] fileBytes = await ModelsaberUtils.GetModelBytes(model);
-            string modelFileName = model.Download.Substring(model.Download.LastIndexOf("/") + 1);
+            string modelFileName = model.Download.Substring(model.Download.LastIndexOf('/') + 1);
 
             Plugin.Log.Info("Checking hash...");
-            if (model.Hash.ToLower() == MD5Checksum(fileBytes).ToLower()) Plugin.Log.Info($"Hash check for {model.Name} passed!");
+            if (string.Equals(model.Hash, MD5Checksum(fileBytes), StringComparison.OrdinalIgnoreCase))
+            {
+                Plugin.Log.Info($"Hash check for {model.Name} passed!");
+            }
             else
             {
                 Plugin.Log.Error($"HASH CHECK FAILED FOR {model.Name}!");
@@ -140,7 +151,7 @@ namespace ModelDownloader.Utils
                     foreach (string directoryFile in directoryFiles)
                     {
                         string filePath = directoryFile.Replace(path, "");
-                        if (filePath.Length > 0 && filePath.StartsWith(@"\"))
+                        if (filePath.Length > 0 && filePath.StartsWith("\\"))
                         {
                             filePath = filePath.Substring(1, filePath.Length - 1);
                         }

@@ -1,5 +1,4 @@
-﻿using BeatSaberMarkupLanguage;
-using BeatSaberMarkupLanguage.Animations;
+﻿using BeatSaberMarkupLanguage.Animations;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
@@ -57,6 +56,7 @@ namespace ModelDownloader.Settings.UI
         {
             didSelectModel?.Invoke(_models[row], customListTableData.data[row].icon);
         }
+
         [Inject]
         protected void Construct(LevelPackDetailViewController levelPackDetailViewController, PluginConfig pluginConfig)
         {
@@ -67,9 +67,9 @@ namespace ModelDownloader.Settings.UI
         [UIAction("#post-parse")]
         public void SetupList()
         {
-            (transform as RectTransform).sizeDelta = new Vector2(70, 0);
-            (transform as RectTransform).anchorMin = new Vector2(0.5f, 0);
-            (transform as RectTransform).anchorMax = new Vector2(0.5f, 1);
+            rectTransform.sizeDelta = new Vector2(70, 0);
+            rectTransform.anchorMin = new Vector2(0.5f, 0);
+            rectTransform.anchorMax = new Vector2(0.5f, 1);
 
             sourceListTableData.data.Clear();
             sourceListTableData.data.Add(new CustomListTableData.CustomCellInfo("Newest"));
@@ -117,8 +117,8 @@ namespace ModelDownloader.Settings.UI
         [UIAction("pageUpPressed")]
         internal void PageUpPressed()
         {
-
         }
+
         [UIAction("pageDownPressed")]
         internal void PageDownPressed()
         {
@@ -153,7 +153,6 @@ namespace ModelDownloader.Settings.UI
             ClearData();
         }
 
-
         public async void GetModelPages(int page)
         {
             searchingForPage = true;
@@ -168,6 +167,7 @@ namespace ModelDownloader.Settings.UI
                 if (DownloadUtils.CheckIfModelInstalled(entry)) customListTableData.data.Add(new ModelCellInfo(entry, CellDidSetImage, $"<#7F7F7F>{entry.Name}", entry.Author));
                 else customListTableData.data.Add(new ModelCellInfo(entry, CellDidSetImage, entry.Name, entry.Author));
             }
+
             SetLoading(false);
 
             customListTableData.tableView.ReloadData();
@@ -197,12 +197,14 @@ namespace ModelDownloader.Settings.UI
         {
             public ModelsaberEntry Model;
             protected Action<CustomListTableData.CustomCellInfo> _callback;
+
             public ModelCellInfo(ModelsaberEntry model, Action<CustomListTableData.CustomCellInfo> callback, string text, string subtext = null) : base(text, subtext, null)
             {
                 Model = model;
                 _callback = callback;
                 LoadImage();
             }
+
             protected async void LoadImage()
             {
                 byte[] image = await Model.GetCoverImageBytes();
@@ -216,7 +218,7 @@ namespace ModelDownloader.Settings.UI
                 }
                 else
                 {
-                    if(Model.Tags.Where(x => x.ToLower() == "nsfw").Count() > 0 && _pluginConfig.BlurNSFWImages)
+                    if (Model.Tags.Where(x => x.ToLower() == "nsfw").Count() > 0 && _pluginConfig.BlurNSFWImages)
                     {
                         // nsfw image, blur it.
                         icon = SpriteUtils.LoadSpriteFromTexture(_kawaseBlurRenderer.Blur(SpriteUtils.LoadTextureRaw(image), KawaseBlurRendererSO.KernelSize.Kernel35, 2));
@@ -252,7 +254,8 @@ namespace ModelDownloader.Settings.UI
                     break;
                 }
             }
-            FixAnimatedIcons(); 
+
+            FixAnimatedIcons();
             //customListTableData.tableView.RefreshCellsContent();
         }
 
@@ -286,6 +289,7 @@ namespace ModelDownloader.Settings.UI
                             }
                         }
                         else image.sprite = dataCell.icon;
+
                         continue;
                     }
                 }
@@ -310,6 +314,7 @@ namespace ModelDownloader.Settings.UI
         public CurvedTextMeshPro NameText = null;
 
         bool ignoringWarnings = false;
+
         internal void DisplayWarningPromptIfNeeded(ModelsaberEntry model)
         {
             if (ignoringWarnings || _pluginConfig.DisableWarnings) return;
@@ -318,12 +323,13 @@ namespace ModelDownloader.Settings.UI
             else if (model.Type == "platform" && !ModUtils.CustomPlatformsInstalled) warningPromptText = "Custom Platforms";
             else if (model.Type == "avatar" && !ModUtils.CustomAvatarsInstalled) warningPromptText = "Custom Avatars";
             else if (model.Type == "saber" && !ModUtils.CustomSabersInstalled && !ModUtils.SaberFactoryInstalled) warningPromptText = "Saber Factory";
-            if(warningPromptText != "")
+            if (warningPromptText != "")
             {
                 NameText.text = $"This model requires the {warningPromptText} mod. Please install this mod from Mod Assistant or #pc-mods in BSMG to properly use this model.";
                 parserParams.EmitEvent("open-warningModal");
             }
         }
+
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             interactableGroup.gameObject.SetActive(true);
@@ -368,6 +374,7 @@ namespace ModelDownloader.Settings.UI
                 GetModelPages(currentPage);
             }
         }
+
         // =========================
         // SEARCH CODE
         // =========================
@@ -375,6 +382,7 @@ namespace ModelDownloader.Settings.UI
         public ModalKeyboard _searchKeyboard = null;
 
         private string _searchValue = "";
+
         [UIValue("searchValue")]
         public string SearchValue
         {
@@ -412,13 +420,11 @@ namespace ModelDownloader.Settings.UI
             //ClearData();
             //filterDidChange?.Invoke();
             //await GetNewPage(3);
-
         }
 
         internal void TagKeyPressed(KEYBOARD.KEY key)
         {
             _searchKeyboard.keyboard.KeyboardText.text = "tag:";
         }
-
     }
 }

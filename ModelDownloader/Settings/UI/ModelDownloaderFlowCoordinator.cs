@@ -42,16 +42,10 @@ namespace ModelDownloader.Settings.UI
             }
         }
 
-
-        protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
-        {
-            base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-        }
-
         protected override void BackButtonWasPressed(ViewController topViewController)
         {
             // Dismiss ourselves
-            _mainFlow.DismissFlowCoordinator(this, null);
+            _mainFlow.DismissFlowCoordinator(this);
         }
 
         internal void HandleDidSelectModel(ModelsaberEntry model, Sprite cover = null)
@@ -61,28 +55,32 @@ namespace ModelDownloader.Settings.UI
             {
                 PushViewControllerToNavigationController(_modelNavigationController, _modelDetail);
             }
+
             SetRightScreenViewController(_modelPreview, ViewController.AnimationType.None);
             _modelPreview.ClearData();
 
             _modelDetail.Initialize(model, cover);
             //_songDetailView.Initialize(song, cover);
         }
+
         internal void HandleDidSelectAuthor(string author)
         {
             _modelList.currentSearch = author;
             _modelList.ClearData();
             _modelList.GetModelPages(0);
         }
+
         internal void HandleDownload(ModelsaberEntry model)
         {
-
             _modelList.DisableDownloadsOnModel(model);
             _modelList.DisplayWarningPromptIfNeeded(model);
         }
+
         internal void HandlePreview(ModelsaberEntry model)
         {
             _modelPreview.CreatePreview(model);
         }
+
         internal void HandleDonate()
         {
             _modelList.OpenDonateModal();

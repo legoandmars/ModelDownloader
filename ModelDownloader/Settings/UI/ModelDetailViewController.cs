@@ -1,5 +1,4 @@
-﻿using BeatSaberMarkupLanguage;
-using BeatSaberMarkupLanguage.Animations;
+﻿using BeatSaberMarkupLanguage.Animations;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Notify;
 using BeatSaberMarkupLanguage.ViewControllers;
@@ -9,7 +8,6 @@ using ModelDownloader.Types;
 using ModelDownloader.Utils;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;

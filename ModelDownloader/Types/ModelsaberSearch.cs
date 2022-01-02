@@ -26,6 +26,7 @@
         Platform = 3,
         Avatar = 4
     }
+
     public enum ModelsaberSearchSort
     {
         Newest = 0,
