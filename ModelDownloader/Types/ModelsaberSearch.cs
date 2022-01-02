@@ -1,15 +1,15 @@
 ﻿namespace ModelDownloader.Types
 {
-    public class ModelsaberSearch
+    public class ModelSaberSearch
     {
-        public ModelsaberSearchType ModelType = ModelsaberSearchType.All;
-        public ModelsaberSearchSort ModelSort = ModelsaberSearchSort.Newest;
-        public string Search = "";
-        public int Page = 0;
+        public ModelsaberSearchType ModelType { get; } = ModelsaberSearchType.All;
+        public ModelsaberSearchSort ModelSort { get; } = ModelsaberSearchSort.Newest;
+        public string Search { get; } = string.Empty;
+        public int Page { get; } = 0;
 
-        public readonly int PageLength = 18;
+        public const int PageLength = 18;
 
-        public ModelsaberSearch(ModelsaberSearchType type = ModelsaberSearchType.All, int page = 0, ModelsaberSearchSort sort = ModelsaberSearchSort.Newest, string search = "")
+        public ModelSaberSearch(ModelsaberSearchType type = ModelsaberSearchType.All, int page = 0, ModelsaberSearchSort sort = ModelsaberSearchSort.Newest, string search = "")
         {
             ModelType = type;
             Page = page;

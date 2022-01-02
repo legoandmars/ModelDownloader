@@ -10,17 +10,12 @@ using SiraUtil.Zenject;
 
 namespace ModelDownloader
 {
-    [Plugin(RuntimeOptions.SingleStartInit)]
+    [Plugin(RuntimeOptions.DynamicInit)]
     public class Plugin
     {
-        internal static IPALogger Log { get; private set; }
-
         [Init]
-        public void Init(IPALogger logger, Config config, Zenjector zenjector)
+        public Plugin(IPALogger logger, Config config, Zenjector zenjector)
         {
-            Log = logger;
-            Log.Info("ModelDownloader initialized.");
-            
             zenjector.UseLogger(logger);
             zenjector.UseHttpService();
             
@@ -31,8 +26,6 @@ namespace ModelDownloader
         [OnStart]
         public void OnApplicationStart()
         {
-            Log.Debug("OnApplicationStart");
-
             DownloadUtils.CheckDownloadedFiles();
             ModelDownloaderPatchManager.ApplyHarmonyPatches();
         }
@@ -40,8 +33,6 @@ namespace ModelDownloader
         [OnExit]
         public void OnApplicationQuit()
         {
-            Log.Debug("OnApplicationQuit");
-
             ModelDownloaderPatchManager.RemoveHarmonyPatches();
         }
     }

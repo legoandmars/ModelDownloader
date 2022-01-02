@@ -1,6 +1,5 @@
 ﻿using BeatSaberMarkupLanguage.Animations;
 using BeatSaberMarkupLanguage.Attributes;
-using BeatSaberMarkupLanguage.Notify;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using ModelDownloader.Configuration;
@@ -9,32 +8,37 @@ using ModelDownloader.Utils;
 using System;
 using System.Collections;
 using System.Linq;
+using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
 namespace ModelDownloader.Settings.UI
 {
-    internal class ModelDetailViewController : BSMLResourceViewController, INotifiableHost
+    internal class ModelDetailViewController : BSMLResourceViewController
     {
-        public override string ResourceName => "ModelDownloader.Settings.UI.Views.modelDetail.bsml";
-
-        public Action<string> didClickAuthor;
-        public Action<ModelsaberEntry> downloadPressed;
-        public Action<ModelsaberEntry> previewPressed;
-        public Action donatePressed;
-
+        private SiraLog _siraLog = null!;
+        private PluginConfig _pluginConfig = null!;
+        private DownloadUtils _downloadUtils = null!;
+        
+        private ModelSaberEntry _currentModel;
+        
         private bool _downloadInteractable = false;
         private bool _previewInteractable = false;
 
-        private ModelsaberEntry _currentModel;
+        public override string ResourceName => "ModelDownloader.Settings.UI.Views.modelDetail.bsml";
 
-        private PluginConfig _pluginConfig;
+        public Action<string> didClickAuthor;
+        public Action<ModelSaberEntry> downloadPressed;
+        public Action<ModelSaberEntry> previewPressed;
+        public Action donatePressed;
 
         [Inject]
-        protected void Construct(PluginConfig pluginConfig)
+        protected void Construct(SiraLog siraLog, PluginConfig pluginConfig, DownloadUtils downloadUtils)
         {
+            _siraLog = siraLog;
             _pluginConfig = pluginConfig;
+            _downloadUtils = downloadUtils;
         }
 
         [UIComponent("donateButton")]
@@ -74,7 +78,7 @@ namespace ModelDownloader.Settings.UI
         }
 
         [UIValue("previewInteractable")]
-        public bool PreviewInteractible
+        public bool PreviewInteractable
         {
             get => _previewInteractable;
             set
@@ -87,9 +91,9 @@ namespace ModelDownloader.Settings.UI
         [UIAction("#post-parse")]
         internal void Setup()
         {
-            (transform as RectTransform).sizeDelta = new Vector2(70, 0);
-            (transform as RectTransform).anchorMin = new Vector2(0.5f, 0);
-            (transform as RectTransform).anchorMax = new Vector2(0.5f, 1);
+            rectTransform.sizeDelta = new Vector2(70, 0);
+            rectTransform.anchorMin = new Vector2(0.5f, 0);
+            rectTransform.anchorMax = new Vector2(0.5f, 1);
 
             SetupDetailView();
         }
@@ -107,28 +111,28 @@ namespace ModelDownloader.Settings.UI
         {
         }
 
-        internal void Initialize(ModelsaberEntry model, Sprite cover) {
+        internal void Initialize(ModelSaberEntry model, Sprite cover) {
             _currentModel = model;
             Thumbnail.sprite = cover;
 
             if (model.Thumbnail.EndsWith(".gif"))
             {
-                var foundAnimation = AnimationController.instance.RegisteredAnimations.FirstOrDefault(x => x.Key == model.Id.ToString() + ".gif");
+                var foundAnimation = AnimationController.instance.RegisteredAnimations.FirstOrDefault(x => x.Key == model.Id + ".gif");
                 if (foundAnimation.Value != null) foundAnimation.Value.activeImages.Add(Thumbnail);
             }
             NameText.text = model.Name;
             AuthorText.text = model.Author;
 
             DownloadInteractable = !DownloadUtils.CheckIfModelInstalled(model);
-            PreviewInteractible = !DownloadUtils.CheckIfModelInstalled(model) && (model.Type != "platform" && model.Type != "avatar");
+            PreviewInteractable = !DownloadUtils.CheckIfModelInstalled(model) && (model.Type != "platform" && model.Type != "avatar");
             // Plugin.Log.Info(_pluginConfig.AutomaticallyGeneratePreviews.ToString());
-            if (_pluginConfig.AutomaticallyGeneratePreviews && PreviewInteractible) PreviewPressed();
+            if (_pluginConfig.AutomaticallyGeneratePreviews && PreviewInteractable) PreviewPressed();
         }
 
         [UIAction("author-name-click")]
         internal void OnAuthorNameClick()
         {
-            Plugin.Log.Info("Clicked author name...");
+            _siraLog.Info("Clicked author name...");
             didClickAuthor?.Invoke("author:"+AuthorText.text);
         }
 
@@ -136,14 +140,14 @@ namespace ModelDownloader.Settings.UI
         internal void DownloadPressed()
         {
             DownloadInteractable = false;
-            DownloadUtils.DownloadModel(_currentModel);
+            _downloadUtils.DownloadModel(_currentModel);
             downloadPressed?.Invoke(_currentModel);
         }
 
         [UIAction("previewPressed")]
         internal void PreviewPressed()
         {
-            PreviewInteractible = false;
+            PreviewInteractable = false;
             previewPressed?.Invoke(_currentModel);
         }
 

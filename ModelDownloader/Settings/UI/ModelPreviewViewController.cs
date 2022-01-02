@@ -17,9 +17,10 @@ namespace ModelDownloader.Settings.UI
         public override string ResourceName => "ModelDownloader.Settings.UI.Views.modelPreview.bsml";
 
         private GameplaySetupViewController _gameplaySetupViewController = null!;
+        private DownloadUtils _downloadUtils = null!;
         private ModUtils _modUtils = null!;
 
-        private ModelsaberEntry _model;
+        private ModelSaberEntry _model;
         private GameObject _previewHolder;
         private AssetBundle _bundle;
 
@@ -27,15 +28,20 @@ namespace ModelDownloader.Settings.UI
         public CurvedTextMeshPro LoadingText = null;
 
         [Inject]
-        internal void Construct(GameplaySetupViewController gameplaySetupViewController, ModUtils modUtils)
+        internal void Construct(GameplaySetupViewController gameplaySetupViewController, DownloadUtils downloadUtils, ModUtils modUtils)
         {
             _gameplaySetupViewController = gameplaySetupViewController;
+            _downloadUtils = downloadUtils;
             _modUtils = modUtils;
         }
 
         internal void ClearData()
         {
-            if (LoadingText != null) LoadingText.text = "";
+            if (LoadingText != null)
+            {
+                LoadingText.text = "";
+            }
+
             if (_previewHolder != null)
             {
                 Destroy(_previewHolder);
@@ -48,7 +54,7 @@ namespace ModelDownloader.Settings.UI
             }
         }
 
-        internal async void CreatePreview(ModelsaberEntry model)
+        internal async void CreatePreview(ModelSaberEntry model)
         {
             ClearData();
             LoadingText.text = "Loading Preview...";
@@ -59,8 +65,12 @@ namespace ModelDownloader.Settings.UI
             _previewHolder.transform.localScale = Vector3.one;
             _previewHolder.transform.rotation = Quaternion.identity;
 
-            AssetBundle bundle = await DownloadUtils.DownloadModelAsPreview(model);
-            if (bundle == null) return;
+            AssetBundle? bundle = await _downloadUtils.DownloadModelAsPreview(model);
+            if (bundle == null)
+            {
+                return;
+            }
+
             _bundle = bundle;
             if (model.Type == "saber")
             {

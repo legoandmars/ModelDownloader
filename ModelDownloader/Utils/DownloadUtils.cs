@@ -7,74 +7,114 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using SiraUtil.Logging;
 using UnityEngine;
 
 namespace ModelDownloader.Utils
 {
-    public static class DownloadUtils
+    internal class DownloadUtils
     {
-        private static List<string> InstalledSabers;
-        private static List<string> InstalledBloqs;
-        private static List<string> InstalledAvatars;
-        private static List<string> InstalledPlatforms;
+        private readonly SiraLog _siraLog;
+        private readonly ModelSaberUtils _modelSaberUtils;
+
+        private static List<string> _installedSabers = new();
+        private static List<string> _installedBloqs = new();
+        private static List<string> _installedAvatars = new();
+        private static List<string> _installedPlatforms = new();
+
+        public DownloadUtils(SiraLog siraLog, ModelSaberUtils modelSaberUtils)
+        {
+            _siraLog = siraLog;
+            _modelSaberUtils = modelSaberUtils;
+        }
 
         public static void CheckDownloadedFiles()
         {
             IEnumerable<string> saberFilter = new List<string> { "*.saber" };
-            InstalledSabers = GetFileNames(Path.Combine(UnityGame.InstallPath, "CustomSabers"), saberFilter, SearchOption.AllDirectories, true);
+            _installedSabers = GetFileNames(Path.Combine(UnityGame.InstallPath, "CustomSabers"), saberFilter, SearchOption.AllDirectories, true);
 
             IEnumerable<string> noteFilter = new List<string> { "*.bloq" };
-            InstalledBloqs = GetFileNames(Path.Combine(UnityGame.InstallPath, "CustomNotes"), noteFilter, SearchOption.AllDirectories, true);
+            _installedBloqs = GetFileNames(Path.Combine(UnityGame.InstallPath, "CustomNotes"), noteFilter, SearchOption.AllDirectories, true);
 
             IEnumerable<string> avatarFilter = new List<string> { "*.avatar" };
-            InstalledAvatars = GetFileNames(Path.Combine(UnityGame.InstallPath, "CustomAvatars"), avatarFilter, SearchOption.AllDirectories, true);
+            _installedAvatars = GetFileNames(Path.Combine(UnityGame.InstallPath, "CustomAvatars"), avatarFilter, SearchOption.AllDirectories, true);
 
             IEnumerable<string> platformFilter = new List<string> { "*.plat" };
-            InstalledPlatforms = GetFileNames(Path.Combine(UnityGame.InstallPath, "CustomPlatforms"), platformFilter, SearchOption.AllDirectories, true);
+            _installedPlatforms = GetFileNames(Path.Combine(UnityGame.InstallPath, "CustomPlatforms"), platformFilter, SearchOption.AllDirectories, true);
         }
 
-        public static bool CheckIfModelInstalled(ModelsaberEntry model)
+        public static bool CheckIfModelInstalled(ModelSaberEntry model)
         {
             string modelFileName = model.Download.Substring(model.Download.LastIndexOf('/') + 1);
 
-            if (model.Type == "saber") return InstalledSabers.Contains(modelFileName);
-            else if (model.Type == "bloq") return InstalledBloqs.Contains(modelFileName);
-            else if (model.Type == "avatar") return InstalledAvatars.Contains(modelFileName);
-            else if (model.Type == "platform") return InstalledPlatforms.Contains(modelFileName);
-            else return false;
+            return model.Type switch
+            {
+                "saber" => _installedSabers.Contains(modelFileName),
+                "bloq" => _installedBloqs.Contains(modelFileName),
+                "avatar" => _installedAvatars.Contains(modelFileName),
+                "platform" => _installedPlatforms.Contains(modelFileName),
+                _ => false
+            };
         }
 
-        public static void AddToInstalledList(ModelsaberEntry model)
+        public static void AddToInstalledList(ModelSaberEntry model)
         {
             string modelFileName = model.Download.Substring(model.Download.LastIndexOf('/') + 1);
 
-            if (model.Type == "saber") InstalledSabers.Add(modelFileName);
-            else if (model.Type == "bloq") InstalledBloqs.Add(modelFileName);
-            else if (model.Type == "avatar") InstalledAvatars.Add(modelFileName);
-            else if (model.Type == "platform") InstalledPlatforms.Add(modelFileName);
+            switch (model.Type)
+            {
+                case "saber":
+                    _installedSabers.Add(modelFileName);
+                    break;
+                case "bloq":
+                    _installedBloqs.Add(modelFileName);
+                    break;
+                case "avatar":
+                    _installedAvatars.Add(modelFileName);
+                    break;
+                case "platform":
+                    _installedPlatforms.Add(modelFileName);
+                    break;
+            }
         }
 
-        public static void DownloadModel(ModelsaberEntry model)
+        public void DownloadModel(ModelSaberEntry model)
         {
-            if (model.Type == "saber") DownloadModel(model, Path.Combine(UnityGame.InstallPath, "CustomSabers"));
-            else if (model.Type == "bloq") DownloadModel(model, Path.Combine(UnityGame.InstallPath, "CustomNotes"));
-            else if (model.Type == "avatar") DownloadModel(model, Path.Combine(UnityGame.InstallPath, "CustomAvatars"));
-            else if (model.Type == "platform") DownloadModel(model, Path.Combine(UnityGame.InstallPath, "CustomPlatforms"));
+            switch (model.Type)
+            {
+                case "saber":
+                    DownloadModel(model, Path.Combine(UnityGame.InstallPath, "CustomSabers"));
+                    break;
+                case "bloq":
+                    DownloadModel(model, Path.Combine(UnityGame.InstallPath, "CustomNotes"));
+                    break;
+                case "avatar":
+                    DownloadModel(model, Path.Combine(UnityGame.InstallPath, "CustomAvatars"));
+                    break;
+                case "platform":
+                    DownloadModel(model, Path.Combine(UnityGame.InstallPath, "CustomPlatforms"));
+                    break;
+            }
         }
 
-        public static async void DownloadModel(ModelsaberEntry model, string downloadDirectoryPath)
+        public async Task DownloadModel(ModelSaberEntry model, string downloadDirectoryPath)
         {
-            byte[] fileBytes = await ModelsaberUtils.GetModelBytes(model);
+            var fileBytes = await _modelSaberUtils.GetModelBytes(model);
+            if (fileBytes == null)
+            {
+                return;
+            }
+
             string modelFileName = model.Download.Substring(model.Download.LastIndexOf('/') + 1);
 
-            Plugin.Log.Info("Checking hash...");
+            _siraLog.Info("Checking hash...");
             if (string.Equals(model.Hash, MD5Checksum(fileBytes), StringComparison.OrdinalIgnoreCase))
             {
-                Plugin.Log.Info($"Hash check for {model.Name} passed!");
+                _siraLog.Info($"Hash check for {model.Name} passed!");
             }
             else
             {
-                Plugin.Log.Error($"HASH CHECK FAILED FOR {model.Name}!");
+                _siraLog.Error($"HASH CHECK FAILED FOR {model.Name}!");
                 return;
             }
 
@@ -111,19 +151,22 @@ namespace ModelDownloader.Utils
         }
 
         // Some methods to help with previews
-        public static async Task<AssetBundle> DownloadModelAsPreview(ModelsaberEntry model)
+        public async Task<AssetBundle?> DownloadModelAsPreview(ModelSaberEntry model)
         {
-            byte[] fileBytes = await ModelsaberUtils.GetModelBytes(model);
-            string modelFileName = model.Download.Substring(model.Download.LastIndexOf('/') + 1);
+            var fileBytes = await _modelSaberUtils.GetModelBytes(model);
+            if (fileBytes == null)
+            {
+                return null;
+            }
 
-            Plugin.Log.Info("Checking hash...");
+            _siraLog.Info("Checking hash...");
             if (string.Equals(model.Hash, MD5Checksum(fileBytes), StringComparison.OrdinalIgnoreCase))
             {
-                Plugin.Log.Info($"Hash check for {model.Name} passed!");
+                _siraLog.Info($"Hash check for {model.Name} passed!");
             }
             else
             {
-                Plugin.Log.Error($"HASH CHECK FAILED FOR {model.Name}!");
+                _siraLog.Error($"HASH CHECK FAILED FOR {model.Name}!");
                 return null;
             }
 
@@ -137,7 +180,7 @@ namespace ModelDownloader.Utils
         /// <param name="filters">Pattern(s) to search for.</param>
         /// <param name="searchOption">Search options.</param>
         /// <param name="returnShortPath">Remove path from filepaths.</param>
-        public static List<string> GetFileNames(string path, IEnumerable<string> filters, SearchOption searchOption, bool returnShortPath = false)
+        private static List<string> GetFileNames(string path, IEnumerable<string> filters, SearchOption searchOption, bool returnShortPath = false)
         {
             IList<string> filePaths = new List<string>();
 

@@ -1,6 +1,7 @@
 ﻿using HMUI;
 using ModelDownloader.Managers;
 using ModelDownloader.Settings.UI;
+using ModelDownloader.Types;
 using Zenject;
 
 namespace ModelDownloader.Installers
@@ -17,6 +18,8 @@ namespace ModelDownloader.Installers
 
             Container.BindInterfacesTo<MenuButtonManager>().AsSingle();
             Container.BindInterfacesTo<ModelSettingsController>().AsSingle();
+
+            Container.Bind<ModelSaberEntry>().AsTransient();
         }
     }
 }

@@ -88,14 +88,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')"/>
-        <None Include="ModelDownloader.csproj.user" Condition="Exists('ModelDownloader.csproj.user')"/>
+        <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
+        <None Include="ModelDownloader.csproj.user" Condition="Exists('ModelDownloader.csproj.user')" />
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="manifest.json"/>
-        <EmbeddedResource Include="Settings\UI\Views\*.bsml"/>
-        <EmbeddedResource Include="Settings\UI\Resources\patreon.png"/>
+        <EmbeddedResource Include="manifest.json" />
+        <EmbeddedResource Include="Settings\UI\Views\*.bsml" />
+        <EmbeddedResource Include="Settings\UI\Resources\patreon.png" />
     </ItemGroup>
 
     <ItemGroup>

@@ -2,11 +2,20 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ModelDownloader.Utils;
+using SiraUtil.Logging;
+using Zenject;
 
 namespace ModelDownloader.Types
 {
-    public class ModelsaberEntry
+    internal class ModelSaberEntry
     {
+        [Inject]
+        private readonly ModelSaberUtils _modelSaberUtils = null!;
+
+        [Inject]
+        private readonly SiraLog _siraLog = null!;
+
         [JsonProperty("tags")]
         public List<string> Tags { get; set; }
 
@@ -59,13 +68,13 @@ namespace ModelDownloader.Types
         {
             try
             {
-                return await ModelsaberUtils.GetCoverImageBytes(this);
+                return await _modelSaberUtils.GetCoverImageBytes(this);
             }
             catch (Exception e)
             {
-                Plugin.Log.Error("FAILED TO GET COVER IMAGE:");
-                Plugin.Log.Error(e);
-                Plugin.Log.Error(this.Thumbnail);
+                _siraLog.Error("FAILED TO GET COVER IMAGE:");
+                _siraLog.Error(e);
+                _siraLog.Error(Thumbnail);
                 return null;
             }
         }

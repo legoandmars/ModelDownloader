@@ -48,7 +48,7 @@ namespace ModelDownloader.Settings.UI
             _mainFlow.DismissFlowCoordinator(this);
         }
 
-        internal void HandleDidSelectModel(ModelsaberEntry model, Sprite cover = null)
+        internal void HandleDidSelectModel(ModelSaberEntry model, Sprite cover = null)
         {
             // _modelDetail.ClearData();
             if (!_modelDetail.isInViewControllerHierarchy)
@@ -70,13 +70,13 @@ namespace ModelDownloader.Settings.UI
             _modelList.GetModelPages(0);
         }
 
-        internal void HandleDownload(ModelsaberEntry model)
+        internal void HandleDownload(ModelSaberEntry model)
         {
             _modelList.DisableDownloadsOnModel(model);
             _modelList.DisplayWarningPromptIfNeeded(model);
         }
 
-        internal void HandlePreview(ModelsaberEntry model)
+        internal void HandlePreview(ModelSaberEntry model)
         {
             _modelPreview.CreatePreview(model);
         }

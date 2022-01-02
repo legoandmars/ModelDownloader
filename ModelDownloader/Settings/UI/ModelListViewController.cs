@@ -28,28 +28,31 @@ namespace ModelDownloader.Settings.UI
         public bool searchingForPage = false;
         public bool firstSearch = true;
 
-        private List<ModelsaberEntry> _models = new List<ModelsaberEntry>();
+        private readonly List<ModelSaberEntry> _models = new();
 
-        private static KawaseBlurRendererSO _kawaseBlurRenderer;
+        private PluginConfig _pluginConfig = null!;
+        private ModUtils _modUtils = null!;
+        private ModelSaberUtils _modelSaberUtils = null!;
+        private DiContainer _container = null!;
+        private KawaseBlurRendererSO _kawaseBlurRenderer = null!;
 
-        private static PluginConfig _pluginConfig;
 
         [UIParams]
-        internal BeatSaberMarkupLanguage.Parser.BSMLParserParams parserParams = null;
+        internal BeatSaberMarkupLanguage.Parser.BSMLParserParams parserParams = null!;
 
         [UIValue("model-type-options")]
-        private List<object> modelTypeOptions = new object[] { "All Models", "Sabers", "Bloqs", "Platforms", "Avatars" }.ToList();
+        private List<object> modelTypeOptions = new() { "All Models", "Sabers", "Bloqs", "Platforms", "Avatars" };
 
         [UIValue("model-type-choice")]
         private string modelTypeChoice = "All Models";
 
         [UIComponent("list")]
-        public CustomListTableData customListTableData = null;
+        public CustomListTableData customListTableData = null!;
 
         [UIComponent("loadingModal")]
-        public ModalView loadingModal = null;
+        public ModalView loadingModal = null!;
 
-        public Action<ModelsaberEntry, Sprite> didSelectModel;
+        public Action<ModelSaberEntry, Sprite> didSelectModel;
 
         [UIAction("listSelect")]
         internal void Select(TableView tableView, int row)
@@ -58,11 +61,13 @@ namespace ModelDownloader.Settings.UI
         }
 
         [Inject]
-        protected void Construct(LevelPackDetailViewController levelPackDetailViewController, PluginConfig pluginConfig, ModUtils modUtils)
+        protected void Construct(PluginConfig pluginConfig, ModUtils modUtils, ModelSaberUtils modelSaberUtils, LevelPackDetailViewController levelPackDetailViewController, DiContainer container)
         {
-            _modUtils = modUtils;
-            _kawaseBlurRenderer = levelPackDetailViewController.GetField<KawaseBlurRendererSO, LevelPackDetailViewController>("_kawaseBlurRenderer");
             _pluginConfig = pluginConfig;
+            _modUtils = modUtils;
+            _modelSaberUtils = modelSaberUtils;
+            _container = container;
+            _kawaseBlurRenderer = levelPackDetailViewController.GetField<KawaseBlurRendererSO, LevelPackDetailViewController>("_kawaseBlurRenderer");
         }
 
         [UIAction("#post-parse")]
@@ -159,21 +164,21 @@ namespace ModelDownloader.Settings.UI
             searchingForPage = true;
             SetLoading(true, 0, $"Page {page + 1}/{page + 1}");
             parserParams.EmitEvent("open-loadingModal");
-            ModelsaberSearch searchOptions = new ModelsaberSearch((ModelsaberSearchType)modelTypeOptions.IndexOf(modelTypeChoice), page, currentSort, currentSearch);
-            List<ModelsaberEntry> entries = await ModelsaberUtils.GetPage(searchOptions);
+            ModelSaberSearch searchOptions = new ModelSaberSearch((ModelsaberSearchType)modelTypeOptions.IndexOf(modelTypeChoice), page, currentSort, currentSearch);
+            List<ModelSaberEntry> entries = await _modelSaberUtils.GetPage(searchOptions);
             if (!searchingForPage) return;
-            foreach (ModelsaberEntry entry in entries)
+            foreach (ModelSaberEntry entry in entries)
             {
                 _models.Add(entry);
-                if (DownloadUtils.CheckIfModelInstalled(entry)) customListTableData.data.Add(new ModelCellInfo(entry, CellDidSetImage, $"<#7F7F7F>{entry.Name}", entry.Author));
-                else customListTableData.data.Add(new ModelCellInfo(entry, CellDidSetImage, entry.Name, entry.Author));
+                _container.Inject(entry);
+                customListTableData.data.Add(new ModelCellInfo(_pluginConfig, _kawaseBlurRenderer, CellDidSetImage, entry, DownloadUtils.CheckIfModelInstalled(entry)? $"<#7F7F7F>{entry.Name}" : entry.Name, entry.Author));
             }
 
             SetLoading(false);
 
             customListTableData.tableView.ReloadData();
 
-            int pageScrollAmount = (page * searchOptions.PageLength) - 1;
+            int pageScrollAmount = (page * ModelSaberSearch.PageLength) - 1;
             if (pageScrollAmount > customListTableData.data.Count) pageScrollAmount = customListTableData.data.Count;
             if (pageScrollAmount < 0) pageScrollAmount = 0;
             customListTableData.tableView.ScrollToCellWithIdx(pageScrollAmount, TableView.ScrollPositionType.Beginning, false);
@@ -194,37 +199,53 @@ namespace ModelDownloader.Settings.UI
             */
         }
 
-        public class ModelCellInfo : CustomListTableData.CustomCellInfo
+        internal class ModelCellInfo : CustomListTableData.CustomCellInfo
         {
-            public ModelsaberEntry Model;
-            protected Action<CustomListTableData.CustomCellInfo> _callback;
+            private readonly PluginConfig _config;
+            private readonly KawaseBlurRendererSO _kawaseBlurRenderer;
+            private readonly Action<CustomListTableData.CustomCellInfo> _callback;
 
-            public ModelCellInfo(ModelsaberEntry model, Action<CustomListTableData.CustomCellInfo> callback, string text, string subtext = null) : base(text, subtext, null)
+            public ModelSaberEntry Model;
+
+            public ModelCellInfo(PluginConfig config, KawaseBlurRendererSO blurRenderer, Action<CustomListTableData.CustomCellInfo> callback, ModelSaberEntry model, string text, string? subtext = null)
+                : base(text, subtext)
             {
-                Model = model;
+                _config = config;
+                _kawaseBlurRenderer = blurRenderer;
                 _callback = callback;
+
+                Model = model;
+
                 LoadImage();
             }
 
             protected async void LoadImage()
             {
-                byte[] image = await Model.GetCoverImageBytes();
-                Sprite icon = null;
+                var imageBytes = await Model.GetCoverImageBytes();
+                if (imageBytes == null)
+                {
+                    return;
+                }
+
+                Sprite icon;
 
                 if (Model.Thumbnail.EndsWith(".gif"))
                 {
-                    var animationData = await SpriteUtils.LoadSpriteRawAnimated(image, Model.Id.ToString() + ".gif");
+                    var animationData = await SpriteUtils.LoadSpriteRawAnimated(imageBytes, Model.Id + ".gif");
                     icon = animationData.sprites[0];
-                    icon.name = Model.Id.ToString() + ".gif";
+                    icon.name = Model.Id + ".gif";
                 }
                 else
                 {
-                    if (Model.Tags.Where(x => x.ToLower() == "nsfw").Count() > 0 && _pluginConfig.BlurNSFWImages)
+                    if (Model.Tags.Where(x => x.ToLower() == "nsfw").Any() && _config.BlurNSFWImages)
                     {
                         // nsfw image, blur it.
-                        icon = SpriteUtils.LoadSpriteFromTexture(_kawaseBlurRenderer.Blur(SpriteUtils.LoadTextureRaw(image), KawaseBlurRendererSO.KernelSize.Kernel35, 2));
+                        icon = SpriteUtils.LoadSpriteFromTexture(_kawaseBlurRenderer.Blur(SpriteUtils.LoadTextureRaw(imageBytes), KawaseBlurRendererSO.KernelSize.Kernel35, 2));
                     }
-                    else icon = SpriteUtils.LoadSpriteRaw(image);
+                    else
+                    {
+                        icon = SpriteUtils.LoadSpriteRaw(imageBytes);
+                    }
                 }
 
                 base.icon = icon;
@@ -289,20 +310,21 @@ namespace ModelDownloader.Settings.UI
                                 foundAnimation.Value.activeImages.Add(image);
                             }
                         }
-                        else image.sprite = dataCell.icon;
-
-                        continue;
+                        else
+                        {
+                            image.sprite = dataCell.icon;
+                        }
                     }
                 }
             }
         }
 
-        internal void DisableDownloadsOnModel(ModelsaberEntry model)
+        internal void DisableDownloadsOnModel(ModelSaberEntry model)
         {
             foreach (var visibleCell in customListTableData.tableView.visibleCells)
             {
                 LevelListTableCell levelCell = visibleCell as LevelListTableCell;
-                TextMeshProUGUI _songNameText = ReflectionUtil.GetField<TextMeshProUGUI, LevelListTableCell>(levelCell, "_songNameText");
+                TextMeshProUGUI _songNameText = levelCell.GetField<TextMeshProUGUI, LevelListTableCell>("_songNameText");
                 if (_songNameText?.text == model.Name)
                 {
                     _songNameText.color = new Color(0.498f, 0.498f, 0.498f);
@@ -316,14 +338,21 @@ namespace ModelDownloader.Settings.UI
 
         bool ignoringWarnings = false;
 
-        internal void DisplayWarningPromptIfNeeded(ModelsaberEntry model)
+        internal void DisplayWarningPromptIfNeeded(ModelSaberEntry model)
         {
-            if (ignoringWarnings || _pluginConfig.DisableWarnings) return;
-            string warningPromptText = "";
-            if (model.Type == "bloq" && !_modUtils.CustomNotesInstalled) warningPromptText = "Custom Notes";
-            else if (model.Type == "platform" && !_modUtils.CustomPlatformsInstalled) warningPromptText = "Custom Platforms";
-            else if (model.Type == "avatar" && !_modUtils.CustomAvatarsInstalled) warningPromptText = "Custom Avatars";
-            else if (model.Type == "saber" && !_modUtils.CustomSabersInstalled && !_modUtils.SaberFactoryInstalled) warningPromptText = "Saber Factory";
+            if (ignoringWarnings || _pluginConfig.DisableWarnings)
+            {
+                return;
+            }
+
+            string warningPromptText = model.Type switch
+            {
+                "bloq" when !_modUtils.CustomNotesInstalled => "Custom Notes",
+                "platform" when !_modUtils.CustomPlatformsInstalled => "Custom Platforms",
+                "avatar" when !_modUtils.CustomAvatarsInstalled => "Custom Avatars",
+                "saber" when !_modUtils.CustomSabersInstalled && !_modUtils.SaberFactoryInstalled => "Saber Factory",
+                _ => ""
+            };
             if (warningPromptText != "")
             {
                 NameText.text = $"This model requires the {warningPromptText} mod. Please install this mod from Mod Assistant or #pc-mods in BSMG to properly use this model.";
@@ -334,7 +363,7 @@ namespace ModelDownloader.Settings.UI
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             interactableGroup.gameObject.SetActive(true);
-            ModelsaberUtils.ClearCache();
+            ModelSaberUtils.ClearCache();
 
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
         }
@@ -405,8 +434,6 @@ namespace ModelDownloader.Settings.UI
 
         [UIComponent("interactableGroup")]
         VerticalLayoutGroup interactableGroup = null;
-
-        private ModUtils _modUtils;
 
         [UIAction("searchPressed")]
         internal void SearchPressed(string text)

@@ -17,6 +17,8 @@ namespace ModelDownloader.Installers
         {
             Container.BindInstance(_pluginConfig).AsSingle();
 
+            Container.Bind<DownloadUtils>().AsSingle();
+            Container.Bind<ModelSaberUtils>().AsSingle();
             Container.BindInterfacesAndSelfTo<ModUtils>().AsSingle();
         }
     }
