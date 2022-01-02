@@ -20,6 +20,10 @@ namespace ModelDownloader
         {
             Log = logger;
             Log.Info("ModelDownloader initialized.");
+            
+            zenjector.UseLogger(logger);
+            zenjector.UseHttpService();
+            
             zenjector.Install<ModelDownloaderCoreInstaller>(Location.App, config.Generated<PluginConfig>());
             zenjector.Install<ModelDownloaderMenuInstaller>(Location.Menu);
         }
@@ -29,7 +33,6 @@ namespace ModelDownloader
         {
             Log.Debug("OnApplicationStart");
             DownloadUtils.CheckDownloadedFiles();
-            ModUtils.CheckInstalledMods();
             ModelDownloaderPatches.ApplyHarmonyPatches();
         }
 

@@ -1,18 +1,20 @@
 ﻿using IPA.Loader;
 using System.Linq;
+using Zenject;
 
 namespace ModelDownloader.Utils
 {
-    public static class ModUtils
+    internal class ModUtils : IInitializable
     {
-        public static bool CustomSabersInstalled;
-        public static bool SaberFactoryInstalled;
-        public static bool CustomNotesInstalled;
-        public static bool CustomPlatformsInstalled;
-        public static bool CustomAvatarsInstalled;
+        public bool CustomSabersInstalled { get; private set; }
+        public bool SaberFactoryInstalled { get; private set; }
+        public bool CustomNotesInstalled { get; private set; }
+        public bool CustomPlatformsInstalled { get; private set; }
+        public bool CustomAvatarsInstalled { get; private set; }
 
-        public static void CheckInstalledMods()
+        public void Initialize()
         {
+            // Check status of installed mods
             CustomSabersInstalled = CheckIfModInstalled("Custom Sabers");
             SaberFactoryInstalled = CheckIfModInstalled("Saber Factory");
             CustomNotesInstalled = CheckIfModInstalled("CustomNotes");
@@ -20,6 +22,7 @@ namespace ModelDownloader.Utils
             CustomAvatarsInstalled = CheckIfModInstalled("Custom Avatars");
         }
 
+        // ReSharper disable once ReplaceWithSingleCallToAny
         public static bool CheckIfModInstalled(string modName) => PluginManager.EnabledPlugins.Where(x => x.Name == modName).Any();
 
         //TODO: Refresh models on exit on a per-mod basis. This might be a pain without depending on the proper mods

@@ -16,8 +16,8 @@ namespace ModelDownloader.Settings.UI
     {
         public override string ResourceName => "ModelDownloader.Settings.UI.Views.modelPreview.bsml";
 
-        [Inject]
-        private GameplaySetupViewController _gameplaySetupViewController = null;
+        private GameplaySetupViewController _gameplaySetupViewController = null!;
+        private ModUtils _modUtils = null!;
 
         private ModelsaberEntry _model;
         private GameObject _previewHolder;
@@ -25,6 +25,13 @@ namespace ModelDownloader.Settings.UI
 
         [UIComponent("loading-text")]
         public CurvedTextMeshPro LoadingText = null;
+
+        [Inject]
+        internal void Construct(GameplaySetupViewController gameplaySetupViewController, ModUtils modUtils)
+        {
+            _gameplaySetupViewController = gameplaySetupViewController;
+            _modUtils = modUtils;
+        }
 
         internal void ClearData()
         {
@@ -191,12 +198,12 @@ namespace ModelDownloader.Settings.UI
             }
         }
 
-        public static void ColorizeCustomNote(Color color, float colorStrength, GameObject noteObject)
+        public void ColorizeCustomNote(Color color, float colorStrength, GameObject noteObject)
         {
             Type disableNoteColorType = null;
-            if (ModUtils.CustomNotesInstalled)
+            if (_modUtils.CustomNotesInstalled)
             {
-                disableNoteColorType = PluginManager.EnabledPlugins.Where(x => x.Name == "CustomNotes").FirstOrDefault().Assembly.GetType("CustomNotes.DisableNoteColorOnGameobject");
+                disableNoteColorType = PluginManager.EnabledPlugins.Where(x => x.Name == "CustomNotes").First().Assembly.GetType("CustomNotes.DisableNoteColorOnGameobject");
             }
 
             if (!noteObject || color == null)

@@ -1,4 +1,5 @@
 ﻿using ModelDownloader.Configuration;
+using ModelDownloader.Utils;
 using Zenject;
 
 namespace ModelDownloader.Installers
@@ -15,6 +16,8 @@ namespace ModelDownloader.Installers
         public override void InstallBindings()
         {
             Container.BindInstance(_pluginConfig).AsSingle();
+
+            Container.BindInterfacesAndSelfTo<ModUtils>().AsSingle();
         }
     }
 }

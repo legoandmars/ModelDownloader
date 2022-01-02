@@ -58,8 +58,9 @@ namespace ModelDownloader.Settings.UI
         }
 
         [Inject]
-        protected void Construct(LevelPackDetailViewController levelPackDetailViewController, PluginConfig pluginConfig)
+        protected void Construct(LevelPackDetailViewController levelPackDetailViewController, PluginConfig pluginConfig, ModUtils modUtils)
         {
+            _modUtils = modUtils;
             _kawaseBlurRenderer = levelPackDetailViewController.GetField<KawaseBlurRendererSO, LevelPackDetailViewController>("_kawaseBlurRenderer");
             _pluginConfig = pluginConfig;
         }
@@ -319,10 +320,10 @@ namespace ModelDownloader.Settings.UI
         {
             if (ignoringWarnings || _pluginConfig.DisableWarnings) return;
             string warningPromptText = "";
-            if (model.Type == "bloq" && !ModUtils.CustomNotesInstalled) warningPromptText = "Custom Notes";
-            else if (model.Type == "platform" && !ModUtils.CustomPlatformsInstalled) warningPromptText = "Custom Platforms";
-            else if (model.Type == "avatar" && !ModUtils.CustomAvatarsInstalled) warningPromptText = "Custom Avatars";
-            else if (model.Type == "saber" && !ModUtils.CustomSabersInstalled && !ModUtils.SaberFactoryInstalled) warningPromptText = "Saber Factory";
+            if (model.Type == "bloq" && !_modUtils.CustomNotesInstalled) warningPromptText = "Custom Notes";
+            else if (model.Type == "platform" && !_modUtils.CustomPlatformsInstalled) warningPromptText = "Custom Platforms";
+            else if (model.Type == "avatar" && !_modUtils.CustomAvatarsInstalled) warningPromptText = "Custom Avatars";
+            else if (model.Type == "saber" && !_modUtils.CustomSabersInstalled && !_modUtils.SaberFactoryInstalled) warningPromptText = "Saber Factory";
             if (warningPromptText != "")
             {
                 NameText.text = $"This model requires the {warningPromptText} mod. Please install this mod from Mod Assistant or #pc-mods in BSMG to properly use this model.";
@@ -404,6 +405,8 @@ namespace ModelDownloader.Settings.UI
 
         [UIComponent("interactableGroup")]
         VerticalLayoutGroup interactableGroup = null;
+
+        private ModUtils _modUtils;
 
         [UIAction("searchPressed")]
         internal void SearchPressed(string text)
