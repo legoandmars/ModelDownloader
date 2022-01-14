@@ -23,14 +23,14 @@ namespace ModelDownloader
             zenjector.Install<ModelDownloaderMenuInstaller>(Location.Menu);
         }
 
-        [OnStart]
+        [OnEnable]
         public void OnApplicationStart()
         {
             DownloadUtils.CheckDownloadedFiles();
             ModelDownloaderPatchManager.ApplyHarmonyPatches();
         }
 
-        [OnExit]
+        [OnDisable]
         public void OnApplicationQuit()
         {
             ModelDownloaderPatchManager.RemoveHarmonyPatches();
