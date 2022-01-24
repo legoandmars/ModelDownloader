@@ -24,7 +24,9 @@
         Saber = 1,
         Bloq = 2,
         Platform = 3,
-        Avatar = 4
+        Avatar = 4,
+        Wall = 5,
+        Effect = 6
     }
 
     public enum ModelsaberSearchSort
@@ -32,6 +34,6 @@
         Newest = 0,
         Oldest = 1,
         Name = 2,
-        Author = 3,
+        Author = 3
     }
 }

@@ -7,6 +7,7 @@ using ModelDownloader.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ModelDownloader.Downloaders;
 using UnityEngine;
 using Zenject;
 
@@ -17,7 +18,7 @@ namespace ModelDownloader.Settings.UI
     internal class ModelPreviewViewController : BSMLAutomaticViewController
     {
         private GameplaySetupViewController _gameplaySetupViewController = null!;
-        private DownloadUtils _downloadUtils = null!;
+        private Downloader _downloader = null!;
         private ModUtils _modUtils = null!;
 
         private ModelSaberEntry _model;
@@ -28,10 +29,10 @@ namespace ModelDownloader.Settings.UI
         public CurvedTextMeshPro LoadingText = null;
 
         [Inject]
-        internal void Construct(GameplaySetupViewController gameplaySetupViewController, DownloadUtils downloadUtils, ModUtils modUtils)
+        internal void Construct(GameplaySetupViewController gameplaySetupViewController, Downloader downloader, ModUtils modUtils)
         {
             _gameplaySetupViewController = gameplaySetupViewController;
-            _downloadUtils = downloadUtils;
+            _downloader = downloader;
             _modUtils = modUtils;
         }
 
@@ -65,7 +66,7 @@ namespace ModelDownloader.Settings.UI
             _previewHolder.transform.localScale = Vector3.one;
             _previewHolder.transform.rotation = Quaternion.identity;
 
-            AssetBundle? bundle = await _downloadUtils.DownloadModelAsPreview(model);
+            AssetBundle? bundle = await _downloader.DownloadModelAsPreview(model); //TODO: Fix
             if (bundle == null)
             {
                 return;

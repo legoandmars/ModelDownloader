@@ -1,5 +1,4 @@
-﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
-    child-control-height='false'>
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
     <modal-keyboard id="searchKeyboard" move-to-center="true" value="searchValue" show-event="open-searchKeyboard" hide-event="close-searchKeyboard,closeAllModals" clear-on-open="false"
                     on-enter="searchPressed" clickerino-offerino-closerino="false"/>
     <modal id="sourceModal" show-event="open-sourceModal" hide-event="close-sourceModal,closeAllModals" move-to-center="true" size-delta-y="36" size-delta-x="50" clickerino-offerino-closerino="true">
@@ -14,6 +13,8 @@
             <dropdown-list-setting text='' font-size='0' pref-width='20' size-delta-x='25' value='model-type-choice' choices='model-type-options' apply-on-change='true'
                                    on-change='#model-type-changed'/>
             <button id="searchButton" pad="0" pref-height="8" pref-width="20" text="Search" on-click="searchOpened" click-event="open-searchKeyboard"/>
+            <!-- TODO: Change this to be a dropdown instead of button, buttons suck >:( -->
+            <!-- Where did "sortButton" go in the ViewController :( -->
             <button id="sortButton" pad="0" pref-height="8" pref-width="20" click-event="open-sourceModal" on-click="sortPressed" text="Sort"/>
         </horizontal>
         <modal id="loadingModal" show-event="open-loadingModal" hide-event="close-loadingModal,closeAllModals" move-to-center="true" size-delta-y="35" size-delta-x="48">

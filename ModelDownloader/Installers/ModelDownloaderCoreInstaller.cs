@@ -1,5 +1,6 @@
 ﻿using ModelDownloader.Configuration;
 using ModelDownloader.Utils;
+using ModelDownloader.Downloaders;
 using Zenject;
 
 namespace ModelDownloader.Installers
@@ -17,8 +18,8 @@ namespace ModelDownloader.Installers
         {
             Container.BindInstance(_pluginConfig).AsSingle();
 
-            Container.Bind<DownloadUtils>().AsSingle();
-            Container.Bind<ModelSaberUtils>().AsSingle();
+            Container.Bind<Downloader>().AsSingle();
+            Container.Bind<ModelSaberDownloader>().AsSingle();
             Container.BindInterfacesAndSelfTo<ModUtils>().AsSingle();
         }
     }

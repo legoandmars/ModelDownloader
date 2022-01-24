@@ -8,6 +8,7 @@ using ModelDownloader.Utils;
 using System;
 using System.Collections;
 using System.Linq;
+using ModelDownloader.Downloaders;
 using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,7 +22,7 @@ namespace ModelDownloader.Settings.UI
     {
         private SiraLog _siraLog = null!;
         private PluginConfig _pluginConfig = null!;
-        private DownloadUtils _downloadUtils = null!;
+        private Downloader _downloader = null!;
         
         private ModelSaberEntry _currentModel;
         
@@ -34,11 +35,11 @@ namespace ModelDownloader.Settings.UI
         public Action donatePressed;
 
         [Inject]
-        protected void Construct(SiraLog siraLog, PluginConfig pluginConfig, DownloadUtils downloadUtils)
+        protected void Construct(SiraLog siraLog, PluginConfig pluginConfig, Downloader downloader)
         {
             _siraLog = siraLog;
             _pluginConfig = pluginConfig;
-            _downloadUtils = downloadUtils;
+            _downloader = downloader;
         }
 
         [UIComponent("donateButton")]
@@ -123,8 +124,8 @@ namespace ModelDownloader.Settings.UI
             NameText.text = model.Name;
             AuthorText.text = model.Author;
 
-            DownloadInteractable = !DownloadUtils.CheckIfModelInstalled(model);
-            PreviewInteractable = !DownloadUtils.CheckIfModelInstalled(model) && (model.Type != "platform" && model.Type != "avatar");
+            DownloadInteractable = !Downloader.CheckIfModelInstalled(model);
+            PreviewInteractable = !Downloader.CheckIfModelInstalled(model) && (model.Type != "platform" && model.Type != "avatar");
             // Plugin.Log.Info(_pluginConfig.AutomaticallyGeneratePreviews.ToString());
             if (_pluginConfig.AutomaticallyGeneratePreviews && PreviewInteractable) PreviewPressed();
         }

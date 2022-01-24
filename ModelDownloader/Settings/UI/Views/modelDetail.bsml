@@ -1,15 +1,15 @@
 ﻿<div xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
      horizontal-fit="PreferredSize" vertical-fit="PreferredSize" anchor-pos-y="-2">
-    <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
-        <img preserve-aspect="true" id="thumbnail" pref-width="50" pref-height="50"/>
+    <vertical pad-top="2" horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
+        <img preserve-aspect="true" id="thumbnail" pref-width="40" pref-height="40" />
 
-        <horizontal>
-            <text id="name" text='Model' align='Left' font-size='6' pref-height="6"/>
-            <clickable-text id="author-name" text='Author' align='Right' font-size='4' pref-height="2" on-click='author-name-click'/>
-        </horizontal>
+        <vertical pad-top="3" preferred-width="60">
+            <text id="name" text='Model' align='Left' font-size='6' />
+            <clickable-text id="author-name" text='Author' font-size='6' on-click='author-name-click'/>
+        </vertical>
 
         <horizontal pref-width="50" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="2">
-            <button id="downloadButton" interactable="~downloadInteractable" on-click="downloadPressed" text="Download" pad="0" pref-height="8" pref-width="25" anchor-pos-y="25"/>
+            <primary-button id="downloadButton" interactable="~downloadInteractable" on-click="downloadPressed" text="Download" pad="0" pref-height="8" pref-width="25" anchor-pos-y="25"/>
             <button id="previewButton" interactable="~previewInteractable" on-click="previewPressed" text="Preview" pad="0" pref-height="8" pref-width="25" anchor-pos-y="25"/>
         </horizontal>
     </vertical>
@@ -21,3 +21,4 @@
         </horizontal>
     </vertical>
 </div>
+

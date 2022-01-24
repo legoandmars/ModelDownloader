@@ -10,6 +10,7 @@ using ModelDownloader.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ModelDownloader.Downloaders;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,7 +33,7 @@ namespace ModelDownloader.Settings.UI
 
         private PluginConfig _pluginConfig = null!;
         private ModUtils _modUtils = null!;
-        private ModelSaberUtils _modelSaberUtils = null!;
+        private ModelSaberDownloader _modelSaberDownloader = null!;
         private DiContainer _container = null!;
         private KawaseBlurRendererSO _kawaseBlurRenderer = null!;
 
@@ -40,7 +41,7 @@ namespace ModelDownloader.Settings.UI
         internal BeatSaberMarkupLanguage.Parser.BSMLParserParams parserParams = null!;
 
         [UIValue("model-type-options")]
-        private List<object> modelTypeOptions = new() { "All Models", "Sabers", "Bloqs", "Platforms", "Avatars" };
+        private List<object> modelTypeOptions = new() { "All Models", "Sabers", "Bloqs", "Platforms", "Avatars", "Energy Bar", "Menu Pointers", "Walls", "Effects" };
 
         [UIValue("model-type-choice")]
         private string modelTypeChoice = "All Models";
@@ -60,11 +61,11 @@ namespace ModelDownloader.Settings.UI
         }
 
         [Inject]
-        protected void Construct(PluginConfig pluginConfig, ModUtils modUtils, ModelSaberUtils modelSaberUtils, LevelPackDetailViewController levelPackDetailViewController, DiContainer container)
+        protected void Construct(PluginConfig pluginConfig, ModUtils modUtils, ModelSaberDownloader modelSaberDownloader, LevelPackDetailViewController levelPackDetailViewController, DiContainer container)
         {
             _pluginConfig = pluginConfig;
             _modUtils = modUtils;
-            _modelSaberUtils = modelSaberUtils;
+            _modelSaberDownloader = modelSaberDownlaoder;
             _container = container;
             _kawaseBlurRenderer = levelPackDetailViewController.GetField<KawaseBlurRendererSO, LevelPackDetailViewController>("_kawaseBlurRenderer");
         }
@@ -220,7 +221,7 @@ namespace ModelDownloader.Settings.UI
 
             protected async void LoadImage()
             {
-                var imageBytes = await Model.GetCoverImageBytes();
+                var imageBytes = await Model.GetCoverImageBytes(); // TODO: Fix
                 if (imageBytes == null)
                 {
                     return;
@@ -362,7 +363,7 @@ namespace ModelDownloader.Settings.UI
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             interactableGroup.gameObject.SetActive(true);
-            ModelSaberUtils.ClearCache();
+            ModelSaberDownloader.ClearCache(); // TODO: Fix
 
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
         }

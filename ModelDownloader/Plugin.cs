@@ -1,4 +1,5 @@
-﻿using IPA;
+﻿using Hive.Versioning;
+using IPA;
 using IPA.Config;
 using IPA.Config.Stores;
 using IPALogger = IPA.Logging.Logger;
@@ -13,6 +14,8 @@ namespace ModelDownloader
     [Plugin(RuntimeOptions.DynamicInit)]
     public class Plugin
     {
+        public static Version Version;
+        
         [Init]
         public Plugin(IPALogger logger, Config config, Zenjector zenjector)
         {
@@ -23,14 +26,14 @@ namespace ModelDownloader
             zenjector.Install<ModelDownloaderMenuInstaller>(Location.Menu);
         }
 
-        [OnStart]
+        [OnEnable]
         public void OnApplicationStart()
         {
-            DownloadUtils.CheckDownloadedFiles();
+            // DownloaderUtils.CheckDownloadedFiles();
             ModelDownloaderPatchManager.ApplyHarmonyPatches();
         }
 
-        [OnExit]
+        [OnDisable]
         public void OnApplicationQuit()
         {
             ModelDownloaderPatchManager.RemoveHarmonyPatches();

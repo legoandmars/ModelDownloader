@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ModelDownloader.Utils;
+using ModelDownloader.Downloaders;
 using SiraUtil.Logging;
 using Zenject;
 
@@ -11,7 +11,7 @@ namespace ModelDownloader.Types
     internal class ModelSaberEntry
     {
         [Inject]
-        private readonly ModelSaberUtils _modelSaberUtils = null!;
+        private readonly ModelSaberDownloader _modelSaberDownloaderUtils = null!;
 
         [Inject]
         private readonly SiraLog _siraLog = null!;
@@ -63,20 +63,5 @@ namespace ModelDownloader.Types
 
         [JsonProperty("date")]
         public string Date { get; set; }
-
-        public async Task<byte[]?> GetCoverImageBytes()
-        {
-            try
-            {
-                return await _modelSaberUtils.GetCoverImageBytes(this);
-            }
-            catch (Exception e)
-            {
-                _siraLog.Error("FAILED TO GET COVER IMAGE:");
-                _siraLog.Error(e);
-                _siraLog.Error(Thumbnail);
-                return null;
-            }
-        }
     }
 }
