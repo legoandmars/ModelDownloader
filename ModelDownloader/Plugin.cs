@@ -27,8 +27,8 @@ namespace ModelDownloader
             Instance = this;
             Log = logger;
             Log.Info("ModelDownloader initialized.");
-            zenjector.OnApp<ModelDownloaderCoreInstaller>().WithParameters(config.Generated<PluginConfig>());
-            zenjector.OnMenu<ModelDownloaderMenuInstaller>();
+            zenjector.Install<ModelDownloaderCoreInstaller>(Location.App, config.Generated<PluginConfig>());
+            zenjector.Install<ModelDownloaderMenuInstaller>(Location.Menu);
         }
 
         [OnStart]
