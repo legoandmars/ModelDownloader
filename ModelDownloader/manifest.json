@@ -3,12 +3,12 @@
   "id": "ModelDownloader",
   "name": "ModelDownloader",
   "author": "Bobbie",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "A PC Beat Saber mod that allows you to download Sabers, Notes, Platforms, and Avatars directly from ModelSaber, all from a convenient window within your game.",
-  "gameVersion": "1.28.0",
+  "gameVersion": "1.29.0",
   "dependsOn": {
     "BSIPA": "^4.2.2",
-    "BeatSaberMarkupLanguage": "^1.6.9",
+    "BeatSaberMarkupLanguage": "^1.6.10",
     "SiraUtil": "^3.1.2"
   },
   "features": []
