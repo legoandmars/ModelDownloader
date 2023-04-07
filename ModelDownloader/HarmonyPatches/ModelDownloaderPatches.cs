@@ -31,7 +31,7 @@ namespace ModelDownloader.HarmonyPatches
         {
             if (instance != null && IsPatched)
             {
-                instance.UnpatchAll(InstanceId);
+                Harmony.UnpatchID(InstanceId);
                 IsPatched = false;
             }
         }

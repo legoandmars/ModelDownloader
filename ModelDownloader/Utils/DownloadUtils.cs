@@ -66,6 +66,9 @@ namespace ModelDownloader.Utils
             byte[] fileBytes = await ModelsaberUtils.GetModelBytes(model);
             string modelFileName = model.Download.Substring(model.Download.LastIndexOf("/") + 1);
 
+            // Remove illegal characters from the filename
+            modelFileName = new string(modelFileName.Where(c => !Path.GetInvalidFileNameChars().Contains(c)).ToArray());
+
             Plugin.Log.Info("Checking hash...");
             if (model.Hash.ToLower() == MD5Checksum(fileBytes).ToLower()) Plugin.Log.Info($"Hash check for {model.Name} passed!");
             else
