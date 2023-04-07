@@ -104,6 +104,11 @@ namespace ModelDownloader
             {
                 downloadURL = new Uri(entry.Download.Substring(0, entry.Download.LastIndexOf("/")) + "/" + entry.Download);
             }
+			//encode URL
+			int index = downloadURL.ToString().LastIndexOf('/');
+			string basePart = downloadURL.ToString().Substring(0, index + 1);
+			string encodedPart = Uri.EscapeDataString(downloadURL.ToString().Substring(index + 1));
+	        downloadURL = new Uri(basePart + encodedPart);
             client.BaseAddress = null;
             HttpResponseMessage response = await client.GetAsync(downloadURL);
             byte[] modelBytes = await response.Content.ReadAsByteArrayAsync();
